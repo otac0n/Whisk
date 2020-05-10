@@ -5,4 +5,4 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("10009af8-f2bb-4cf6-8594-f92d84e010dc")]
 [assembly: CLSCompliant(true)]
-[assembly: InternalsVisibleTo("Whisk")]
+[assembly: InternalsVisibleTo("Whisk.Tests")]
