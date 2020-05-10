@@ -22,14 +22,14 @@ namespace Whisk
         }
 
         /// <inheritdoc/>
-        public override event EventHandler<DependencyInvalidatedEventArgs<T>> MarkInvalidated
+        public override event EventHandler<EventArgs> MarkInvalidated
         {
             add { }
             remove { }
         }
 
         /// <inheritdoc/>
-        public override event EventHandler<DependencyInvalidatedEventArgs<T>> SweepInvalidated
+        public override event EventHandler<EventArgs> SweepInvalidated
         {
             add { }
             remove { }

@@ -29,10 +29,10 @@ namespace Whisk
         }
 
         /// <inheritdoc/>
-        public override event EventHandler<DependencyInvalidatedEventArgs<T>> MarkInvalidated;
+        public override event EventHandler<EventArgs> MarkInvalidated;
 
         /// <inheritdoc/>
-        public override event EventHandler<DependencyInvalidatedEventArgs<T>> SweepInvalidated;
+        public override event EventHandler<EventArgs> SweepInvalidated;
 
         /// <inheritdoc/>
         public override T Value => this.value;
@@ -49,9 +49,9 @@ namespace Whisk
         {
             if (!this.comparer.Equals(this.value, value))
             {
-                this.MarkInvalidated?.Invoke(this, new DependencyInvalidatedEventArgs<T>());
+                this.MarkInvalidated?.Invoke(this, EventArgs.Empty);
                 this.value = value;
-                this.SweepInvalidated?.Invoke(this, new DependencyInvalidatedEventArgs<T>());
+                this.SweepInvalidated?.Invoke(this, EventArgs.Empty);
             }
 
             return this.value;

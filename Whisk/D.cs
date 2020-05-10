@@ -47,7 +47,7 @@ namespace Whisk
                 throw new ArgumentNullException(nameof(action));
             }
 
-            void Handler(object sender, DependencyInvalidatedEventArgs<T> args) => action(dependency.Value);
+            void Handler(object sender, EventArgs args) => action(dependency.Value);
             action(dependency.Value);
             dependency.SweepInvalidated += Handler;
             return new DisposeAction(() => dependency.SweepInvalidated -= Handler);

@@ -18,12 +18,12 @@ namespace Whisk
         /// No action should be take to update the value, as other dependencies may still be stale.
         /// This function may be throttled if no sweep operation has happened since the last time the dependency raised this event.
         /// </remarks>
-        public abstract event EventHandler<DependencyInvalidatedEventArgs<T>> MarkInvalidated;
+        public abstract event EventHandler<EventArgs> MarkInvalidated;
 
         /// <summary>
         /// Event raised to allow consumers to perform updates after all stale values have been marked.
         /// </summary>
-        public abstract event EventHandler<DependencyInvalidatedEventArgs<T>> SweepInvalidated;
+        public abstract event EventHandler<EventArgs> SweepInvalidated;
 
         /// <summary>
         /// Gets the value of the dependency.
