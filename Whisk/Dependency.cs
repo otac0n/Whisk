@@ -3,6 +3,7 @@
 namespace Whisk
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// The base clas for dependencies.
@@ -33,6 +34,7 @@ namespace Whisk
         /// Creates a constant dependency for the specified value.
         /// </summary>
         /// <param name="value">The constant value.</param>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Provided via the `D` static class' `Constant` method.")]
         public static implicit operator Dependency<T>(T value) => new ConstantDependency<T>(value);
     }
 }
