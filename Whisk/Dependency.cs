@@ -28,5 +28,11 @@ namespace Whisk
         /// Gets the value of the dependency.
         /// </summary>
         public abstract T Value { get; }
+
+        /// <summary>
+        /// Creates a constant dependency for the specified value.
+        /// </summary>
+        /// <param name="value">The constant value.</param>
+        public static implicit operator Dependency<T>(T value) => new ConstantDependency<T>(value);
     }
 }
