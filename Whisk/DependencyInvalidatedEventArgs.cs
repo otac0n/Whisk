@@ -5,7 +5,7 @@ namespace Whisk
     using System;
 
     /// <summary>
-    /// Event raised when a dependency is invalidated.
+    /// Event raised when a <see cref="Dependency{T}">dependency</see> is invalidated.
     /// </summary>
     /// <typeparam name="T">The type of object that the dependency is tracking.</typeparam>
     public class DependencyInvalidatedEventArgs<T> : EventArgs

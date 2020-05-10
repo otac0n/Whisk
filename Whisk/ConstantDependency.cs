@@ -5,9 +5,9 @@ namespace Whisk
     using System;
 
     /// <summary>
-    /// Holds an immutable reference to a specific object, presented in the form of a <see cref="Dependency{T}"/>.
+    /// Holds an immutable reference to a specific value, presented in the form of a <see cref="Dependency{T}"/>.
     /// </summary>
-    /// <typeparam name="T">The static type of the object contained.</typeparam>
+    /// <typeparam name="T">The static type of the value contained.</typeparam>
     public class ConstantDependency<T> : Dependency<T>
     {
         private readonly T value;
