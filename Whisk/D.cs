@@ -29,6 +29,114 @@ namespace Whisk
         public static MutableDependency<T> Mutable<T>(T value = default, IEqualityComparer<T> comparer = null) => new MutableDependency<T>(value, comparer);
 
         /// <summary>
+        /// Creates a pure computation dependency.
+        /// </summary>
+        /// <typeparam name="T1">The type of the values from the dependency.</typeparam>
+        /// <typeparam name="TResult">The type of value that will be returned.</typeparam>
+        /// <param name="d1">The dependency.</param>
+        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
+        /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
+        public static PureDependency<TResult> Pure<T1, TResult>(Dependency<T1> d1, Func<T1, TResult> evaluate)
+        {
+            return new PureDependency<TResult>(
+                () => evaluate(d1.Value),
+                handler =>
+                {
+                    d1.MarkInvalidated += handler;
+                },
+                handler =>
+                {
+                    d1.MarkInvalidated -= handler;
+                },
+                handler =>
+                {
+                    d1.SweepInvalidated += handler;
+                },
+                handler =>
+                {
+                    d1.SweepInvalidated -= handler;
+                });
+        }
+
+        /// <summary>
+        /// Creates a pure computation dependency.
+        /// </summary>
+        /// <typeparam name="T1">The type of the values from the first dependency.</typeparam>
+        /// <typeparam name="T2">The type of the values from the second dependency.</typeparam>
+        /// <typeparam name="TResult">The type of value that will be returned.</typeparam>
+        /// <param name="d1">The first dependency.</param>
+        /// <param name="d2">The second dependency.</param>
+        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
+        /// <returns>A dependency that will evaluate the specified function on-demand when any of its dependencies have changed.</returns>
+        public static PureDependency<TResult> Pure<T1, T2, TResult>(Dependency<T1> d1, Dependency<T2> d2, Func<T1, T2, TResult> evaluate)
+        {
+            return new PureDependency<TResult>(
+                () => evaluate(d1.Value, d2.Value),
+                handler =>
+                {
+                    d1.MarkInvalidated += handler;
+                    d2.MarkInvalidated += handler;
+                },
+                handler =>
+                {
+                    d1.MarkInvalidated -= handler;
+                    d2.MarkInvalidated -= handler;
+                },
+                handler =>
+                {
+                    d1.SweepInvalidated += handler;
+                    d2.SweepInvalidated += handler;
+                },
+                handler =>
+                {
+                    d1.SweepInvalidated -= handler;
+                    d2.SweepInvalidated -= handler;
+                });
+        }
+
+        /// <summary>
+        /// Creates a pure computation dependency.
+        /// </summary>
+        /// <typeparam name="T1">The type of the values from the first dependency.</typeparam>
+        /// <typeparam name="T2">The type of the values from the second dependency.</typeparam>
+        /// <typeparam name="T3">The type of the values from the third dependency.</typeparam>
+        /// <typeparam name="TResult">The type of value that will be returned.</typeparam>
+        /// <param name="d1">The first dependency.</param>
+        /// <param name="d2">The second dependency.</param>
+        /// <param name="d3">The third dependency.</param>
+        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
+        /// <returns>A dependency that will evaluate the specified function on-demand when any of its dependencies have changed.</returns>
+        public static PureDependency<TResult> Pure<T1, T2, T3, TResult>(Dependency<T1> d1, Dependency<T2> d2, Dependency<T3> d3, Func<T1, T2, T3, TResult> evaluate)
+        {
+            return new PureDependency<TResult>(
+                () => evaluate(d1.Value, d2.Value, d3.Value),
+                handler =>
+                {
+                    d1.MarkInvalidated += handler;
+                    d2.MarkInvalidated += handler;
+                    d3.MarkInvalidated += handler;
+                },
+                handler =>
+                {
+                    d1.MarkInvalidated -= handler;
+                    d2.MarkInvalidated -= handler;
+                    d3.MarkInvalidated -= handler;
+                },
+                handler =>
+                {
+                    d1.SweepInvalidated += handler;
+                    d2.SweepInvalidated += handler;
+                    d3.SweepInvalidated += handler;
+                },
+                handler =>
+                {
+                    d1.SweepInvalidated -= handler;
+                    d2.SweepInvalidated -= handler;
+                    d3.SweepInvalidated -= handler;
+                });
+        }
+
+        /// <summary>
         /// Invokes an action for each value of the dependency.
         /// </summary>
         /// <typeparam name="T">The static type of the values provided by the dependency.</typeparam>
