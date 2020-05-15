@@ -7,7 +7,7 @@ namespace Whisk
     using System.Threading;
 
     /// <summary>
-    /// Static class containing utility methods for creating <see cref="Dependency{T}">dependencies</see>.
+    /// Static class containing utility methods for creating <see cref="IDependency{T}">dependencies</see>.
     /// </summary>
     public static class D
     {
@@ -36,7 +36,7 @@ namespace Whisk
         /// <param name="d1">The dependency.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
-        public static PureDependency<TResult> Pure<T1, TResult>(Dependency<T1> d1, Func<T1, TResult> evaluate)
+        public static PureDependency<TResult> Pure<T1, TResult>(IDependency<T1> d1, Func<T1, TResult> evaluate)
         {
             return new PureDependency<TResult>(
                 () => evaluate(d1.Value),
@@ -68,7 +68,7 @@ namespace Whisk
         /// <param name="d2">The second dependency.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when any of its dependencies have changed.</returns>
-        public static PureDependency<TResult> Pure<T1, T2, TResult>(Dependency<T1> d1, Dependency<T2> d2, Func<T1, T2, TResult> evaluate)
+        public static PureDependency<TResult> Pure<T1, T2, TResult>(IDependency<T1> d1, IDependency<T2> d2, Func<T1, T2, TResult> evaluate)
         {
             return new PureDependency<TResult>(
                 () => evaluate(d1.Value, d2.Value),
@@ -106,7 +106,7 @@ namespace Whisk
         /// <param name="d3">The third dependency.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when any of its dependencies have changed.</returns>
-        public static PureDependency<TResult> Pure<T1, T2, T3, TResult>(Dependency<T1> d1, Dependency<T2> d2, Dependency<T3> d3, Func<T1, T2, T3, TResult> evaluate)
+        public static PureDependency<TResult> Pure<T1, T2, T3, TResult>(IDependency<T1> d1, IDependency<T2> d2, IDependency<T3> d3, Func<T1, T2, T3, TResult> evaluate)
         {
             return new PureDependency<TResult>(
                 () => evaluate(d1.Value, d2.Value, d3.Value),
@@ -143,7 +143,7 @@ namespace Whisk
         /// <param name="dependency">The dependency to watch.</param>
         /// <param name="action">The action to invoke for each value of the dependency.</param>
         /// <returns>An <see cref="IDisposable"/> object that can be disposed to unsubscribe from the invocations.</returns>
-        public static IDisposable Watch<T>(this Dependency<T> dependency, Action<T> action)
+        public static IDisposable Watch<T>(this IDependency<T> dependency, Action<T> action)
         {
             if (dependency == null)
             {

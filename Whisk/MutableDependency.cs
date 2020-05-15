@@ -6,10 +6,10 @@ namespace Whisk
     using System.Collections.Generic;
 
     /// <summary>
-    /// Holds a reference to a value of a specific type, presented in the form of a <see cref="Dependency{T}"/>.
+    /// Holds a reference to a value of a specific type, presented in the form of a <see cref="IDependency{T}">dependency</see>.
     /// </summary>
     /// <typeparam name="T">The static type of the value contained.</typeparam>
-    public sealed class MutableDependency<T> : Dependency<T>
+    public sealed class MutableDependency<T> : IDependency<T>
     {
         private readonly IEqualityComparer<T> comparer;
         private T value;
@@ -29,32 +29,28 @@ namespace Whisk
         }
 
         /// <inheritdoc/>
-        public override event EventHandler<EventArgs> MarkInvalidated;
+        public event EventHandler<EventArgs> MarkInvalidated;
 
         /// <inheritdoc/>
-        public override event EventHandler<EventArgs> SweepInvalidated;
+        public event EventHandler<EventArgs> SweepInvalidated;
 
         /// <inheritdoc/>
-        public override T Value => this.value;
-
-        /// <summary>
-        /// Updates the value stored in this reference.
-        /// </summary>
-        /// <param name="value">The new value to store.</param>
-        /// <returns>The value stored in the reference after the store operation.</returns>
-        /// <remarks>
-        /// If the value is determined to be equal according to the <see cref="IEqualityComparer{T}"/> specified at creation, then the original value will be maintianed and no notification will be sent.
-        /// </remarks>
-        public T Set(T value)
+        public T Value
         {
-            if (!this.comparer.Equals(this.value, value))
+            get
             {
-                this.MarkInvalidated?.Invoke(this, EventArgs.Empty);
-                this.value = value;
-                this.SweepInvalidated?.Invoke(this, EventArgs.Empty);
+                return this.value;
             }
 
-            return this.value;
+            set
+            {
+                if (!this.comparer.Equals(this.value, value))
+                {
+                    this.MarkInvalidated?.Invoke(this, EventArgs.Empty);
+                    this.value = value;
+                    this.SweepInvalidated?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
     }
 }

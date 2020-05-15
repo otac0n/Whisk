@@ -5,10 +5,10 @@ namespace Whisk
     using System;
 
     /// <summary>
-    /// Represents the outcome of a pure computation over <see cref="Dependency{T}">dependencies</see> as a dependency.
+    /// Represents the outcome of a pure computation over <see cref="IDependency{T}">dependencies</see> as a dependency.
     /// </summary>
     /// <typeparam name="T">The static type of the result of the pure computation.</typeparam>
-    public class PureDependency<T> : Dependency<T>
+    public class PureDependency<T> : IDependency<T>
     {
         private const int UnsubscribeThreshold = 1;
         private readonly Action<EventHandler<EventArgs>> addMark;
@@ -32,10 +32,10 @@ namespace Whisk
         }
 
         /// <inheritdoc/>
-        public override event EventHandler<EventArgs> MarkInvalidated;
+        public event EventHandler<EventArgs> MarkInvalidated;
 
         /// <inheritdoc/>
-        public override event EventHandler<EventArgs> SweepInvalidated;
+        public event EventHandler<EventArgs> SweepInvalidated;
 
         private enum State : byte
         {
@@ -45,7 +45,7 @@ namespace Whisk
         }
 
         /// <inheritdoc/>
-        public override T Value
+        public T Value
         {
             get
             {

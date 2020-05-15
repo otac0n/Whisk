@@ -46,7 +46,7 @@ namespace Whisk.Tests
             d.MarkInvalidated += (sender, args) => marked = order++;
             d.SweepInvalidated += (sender, args) => swept = order++;
 
-            d.Set(unchecked(value + 1));
+            d.Value = unchecked(value + 1);
 
             Assert.True(swept > marked);
         }
@@ -59,7 +59,7 @@ namespace Whisk.Tests
             var raised = 0;
             d.MarkInvalidated += (sender, args) => Interlocked.Increment(ref raised);
 
-            d.Set(unchecked(value + 1));
+            d.Value = unchecked(value + 1);
 
             Assert.Equal(1, raised);
         }
@@ -72,7 +72,7 @@ namespace Whisk.Tests
             var raised = 0;
             d.SweepInvalidated += (sender, args) => Interlocked.Increment(ref raised);
 
-            d.Set(unchecked(value + 1));
+            d.Value = unchecked(value + 1);
 
             Assert.Equal(1, raised);
         }
@@ -84,10 +84,10 @@ namespace Whisk.Tests
             var raised = 0;
             d.MarkInvalidated += (sender, args) => Interlocked.Increment(ref raised);
 
-            var result = d.Set("ok");
+            d.Value = "ok";
 
             Assert.Equal(0, raised);
-            Assert.Equal("OK", result);
+            Assert.Equal("OK", d.Value);
         }
 
         [Fact]
@@ -97,10 +97,10 @@ namespace Whisk.Tests
             var raised = 0;
             d.SweepInvalidated += (sender, args) => Interlocked.Increment(ref raised);
 
-            var result = d.Set("ok");
+            d.Value = "ok";
 
             Assert.Equal(0, raised);
-            Assert.Equal("OK", result);
+            Assert.Equal("OK", d.Value);
         }
     }
 }

@@ -5,37 +5,35 @@ namespace Whisk
     using System;
 
     /// <summary>
-    /// Holds an immutable reference to a specific value, presented in the form of a <see cref="Dependency{T}"/>.
+    /// Holds an immutable reference to a specific value, presented in the form of a <see cref="IDependency{T}">dependency</see>.
     /// </summary>
     /// <typeparam name="T">The static type of the value contained.</typeparam>
-    public class ConstantDependency<T> : Dependency<T>
+    public class ConstantDependency<T> : IDependency<T>
     {
-        private readonly T value;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantDependency{T}"/> class.
         /// </summary>
         /// <param name="value">The constant value.</param>
         public ConstantDependency(T value)
         {
-            this.value = value;
+            this.Value = value;
         }
 
         /// <inheritdoc/>
-        public override event EventHandler<EventArgs> MarkInvalidated
+        public event EventHandler<EventArgs> MarkInvalidated
         {
             add { }
             remove { }
         }
 
         /// <inheritdoc/>
-        public override event EventHandler<EventArgs> SweepInvalidated
+        public event EventHandler<EventArgs> SweepInvalidated
         {
             add { }
             remove { }
         }
 
         /// <inheritdoc/>
-        public override T Value => this.value;
+        public T Value { get; }
     }
 }
