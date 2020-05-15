@@ -38,6 +38,11 @@ namespace Whisk
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
         public static PureDependency<TResult> Pure<T1, TResult>(IDependency<T1> d1, Func<T1, TResult> evaluate)
         {
+            if (d1 == null)
+            {
+                throw new ArgumentNullException(nameof(d1));
+            }
+
             return new PureDependency<TResult>(
                 () => evaluate(d1.Value),
                 handler =>
@@ -70,6 +75,16 @@ namespace Whisk
         /// <returns>A dependency that will evaluate the specified function on-demand when any of its dependencies have changed.</returns>
         public static PureDependency<TResult> Pure<T1, T2, TResult>(IDependency<T1> d1, IDependency<T2> d2, Func<T1, T2, TResult> evaluate)
         {
+            if (d1 == null)
+            {
+                throw new ArgumentNullException(nameof(d1));
+            }
+
+            if (d2 == null)
+            {
+                throw new ArgumentNullException(nameof(d2));
+            }
+
             return new PureDependency<TResult>(
                 () => evaluate(d1.Value, d2.Value),
                 handler =>
@@ -108,6 +123,21 @@ namespace Whisk
         /// <returns>A dependency that will evaluate the specified function on-demand when any of its dependencies have changed.</returns>
         public static PureDependency<TResult> Pure<T1, T2, T3, TResult>(IDependency<T1> d1, IDependency<T2> d2, IDependency<T3> d3, Func<T1, T2, T3, TResult> evaluate)
         {
+            if (d1 == null)
+            {
+                throw new ArgumentNullException(nameof(d1));
+            }
+
+            if (d2 == null)
+            {
+                throw new ArgumentNullException(nameof(d2));
+            }
+
+            if (d3 == null)
+            {
+                throw new ArgumentNullException(nameof(d3));
+            }
+
             return new PureDependency<TResult>(
                 () => evaluate(d1.Value, d2.Value, d3.Value),
                 handler =>
