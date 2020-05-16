@@ -14,14 +14,10 @@ namespace Whisk.Tests
         {
             var marks = new HandlerList();
             var sweeps = new HandlerList();
-            void AddMark(EventHandler<EventArgs> handler) => marks.Add(handler);
-            void RemoveMark(EventHandler<EventArgs> handler) => marks.Remove(handler);
-            void AddSweep(EventHandler<EventArgs> handler) => sweeps.Add(handler);
-            void RemoveSweep(EventHandler<EventArgs> handler) => sweeps.Remove(handler);
 
             var markedDirty = 0;
             var sweptDirty = 0;
-            var pure = new PureDependency<string>(() => "OK", AddMark, RemoveMark, AddSweep, RemoveSweep);
+            var pure = new PureDependency<string>(() => "OK", marks.Add, marks.Remove, sweeps.Add, sweeps.Remove);
             pure.MarkInvalidated += (sender, args) => markedDirty++;
             pure.SweepInvalidated += (sender, args) => sweptDirty++;
 
@@ -82,6 +78,10 @@ namespace Whisk.Tests
 
         private class HandlerList : List<EventHandler<EventArgs>>
         {
+            public new void Remove(EventHandler<EventArgs> item)
+            {
+                base.Remove(item);
+            }
         }
     }
 }
