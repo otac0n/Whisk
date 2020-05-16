@@ -3,11 +3,28 @@
 namespace Whisk.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using Xunit;
 
     public class DHelperTests
     {
+        [Fact]
+        public void Set_WhenGivenMultipleValues_UpdatesTheValuesAtomically()
+        {
+            var first = D.Mutable("Reginald");
+            var last = D.Mutable("Dwight");
+            var full = D.Pure(first, last, (f, l) => $"{f} {l}");
+
+            var distinct = new HashSet<string>();
+            using (full.Watch(v => distinct.Add(v)))
+            {
+                D.Set(D.Value(first, "Elton"), D.Value(last, "John"));
+            }
+
+            Assert.Equal(distinct, new HashSet<string> { "Reginald Dwight", "Elton John" });
+        }
+
         [Fact]
         public void Watch_GivenAConstantDependency_InvokesTheActionOnce()
         {

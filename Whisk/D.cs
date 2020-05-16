@@ -167,6 +167,34 @@ namespace Whisk
         }
 
         /// <summary>
+        /// Atomically processes the <see cref="ValueUpdate">value updates</see> obtained by calling <see cref="Value{T}(MutableDependency{T}, T)"/>.
+        /// </summary>
+        /// <param name="setters">The list of value updates to apply atomically.</param>
+        public static void Set(params ValueUpdate[] setters)
+        {
+            var i = 0;
+            void SetNext()
+            {
+                if (i < setters.Length)
+                {
+                    var setter = setters[i++];
+                    setter.SetValue(SetNext);
+                }
+            }
+
+            SetNext();
+        }
+
+        /// <summary>
+        /// Creates a <see cref="ValueUpdate"/> that will be processed during a later call to <see cref="Set(ValueUpdate[])"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of values stored in the dependency.</typeparam>
+        /// <param name="dependency">The dependency to update.</param>
+        /// <param name="value">The new value to set the dependency to.</param>
+        /// <returns>An object that can be provided along with other instances to the <see cref="Set(ValueUpdate[])"/> method to update multiple values atomically.</returns>
+        public static ValueUpdate Value<T>(MutableDependency<T> dependency, T value) => new ValueUpdate<T>(dependency, value);
+
+        /// <summary>
         /// Invokes an action for each value of the dependency.
         /// </summary>
         /// <typeparam name="T">The static type of the values provided by the dependency.</typeparam>
@@ -191,6 +219,19 @@ namespace Whisk
             return new DisposeAction(() => dependency.SweepInvalidated -= Handler);
         }
 
+        /// <summary>
+        /// Contains a tuple of a <see cref="MutableDependency{T}"/> and a value, but erases the type information.
+        /// This allows them to be managed as a collection.
+        /// </summary>
+        public abstract class ValueUpdate
+        {
+            internal ValueUpdate()
+            {
+            }
+
+            internal abstract void SetValue(Action rest);
+        }
+
         private class DisposeAction : IDisposable
         {
             private Action action;
@@ -201,6 +242,20 @@ namespace Whisk
             }
 
             public void Dispose() => Interlocked.Exchange(ref this.action, null)?.Invoke();
+        }
+
+        private class ValueUpdate<T> : ValueUpdate
+        {
+            private readonly MutableDependency<T> dependency;
+            private readonly T value;
+
+            public ValueUpdate(MutableDependency<T> dependency, T value)
+            {
+                this.dependency = dependency;
+                this.value = value;
+            }
+
+            internal override void SetValue(Action rest) => this.dependency.Set(this.value, rest);
         }
     }
 }

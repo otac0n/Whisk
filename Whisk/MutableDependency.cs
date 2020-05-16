@@ -52,5 +52,20 @@ namespace Whisk
                 }
             }
         }
+
+        internal void Set(T value, Action rest = null)
+        {
+            if (!this.comparer.Equals(this.value, value))
+            {
+                this.MarkInvalidated?.Invoke(this, EventArgs.Empty);
+                this.value = value;
+                rest?.Invoke();
+                this.SweepInvalidated?.Invoke(this, EventArgs.Empty);
+            }
+            else
+            {
+                rest?.Invoke();
+            }
+        }
     }
 }
