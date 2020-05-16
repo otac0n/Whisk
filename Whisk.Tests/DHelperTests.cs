@@ -42,9 +42,9 @@ namespace Whisk.Tests
 
             using (dependency.Watch(action))
             {
-                dependency.Set("OK1"); // No change, no update.
-                dependency.Set("OK2");
-                dependency.Set("OK3");
+                dependency.Value = "OK1"; // No change, no update.
+                dependency.Value = "OK2";
+                dependency.Value = "OK3";
             }
 
             Assert.Equal(3, invocations);

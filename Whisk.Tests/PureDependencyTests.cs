@@ -76,7 +76,7 @@ namespace Whisk.Tests
             var mutable = D.Mutable("ok");
             var pure = D.Pure(mutable, value => $"<<{value.ToUpperInvariant()}>>");
             Assert.Equal("<<OK>>", pure.Value);
-            mutable.Set("changed");
+            mutable.Value = "changed";
             Assert.Equal("<<CHANGED>>", pure.Value);
         }
 
