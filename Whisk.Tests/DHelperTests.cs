@@ -94,7 +94,7 @@ namespace Whisk.Tests
         {
             var first = D.Mutable("Reginald");
             var last = D.Mutable("Dwight");
-            var full = D.Pure(first, last, (f, l) => $"{f} {l}");
+            var full = D.Pure(new[] { first, last }, () => $"{first.Value} {last.Value}");
 
             var distinct = new HashSet<string>();
             using (full.Watch(v => distinct.Add(v)))

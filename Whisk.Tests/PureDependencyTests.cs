@@ -70,7 +70,7 @@ namespace Whisk.Tests
         public void Value_AfterMutation_ReturnsTheExpectedValue()
         {
             var mutable = D.Mutable("ok");
-            var pure = D.Pure(mutable, value => $"<<{value.ToUpperInvariant()}>>");
+            var pure = D.Pure(new[] { mutable }, () => $"<<{mutable.Value.ToUpperInvariant()}>>");
             Assert.Equal("<<OK>>", pure.Value);
             mutable.Value = "changed";
             Assert.Equal("<<CHANGED>>", pure.Value);

@@ -4,6 +4,7 @@ namespace Whisk
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
 
     /// <summary>
@@ -31,138 +32,42 @@ namespace Whisk
         /// <summary>
         /// Creates a pure computation dependency.
         /// </summary>
-        /// <typeparam name="T1">The type of the values from the dependency.</typeparam>
-        /// <typeparam name="TResult">The type of value that will be returned.</typeparam>
-        /// <param name="d1">The dependency.</param>
+        /// <typeparam name="T">The static type of value that will be returned.</typeparam>
+        /// <param name="dependencies">The dependency.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
-        public static PureDependency<TResult> Pure<T1, TResult>(IDependency<T1> d1, Func<T1, TResult> evaluate)
+        public static PureDependency<T> Pure<T>(IDependency<object>[] dependencies, Func<T> evaluate)
         {
-            if (d1 == null)
-            {
-                throw new ArgumentNullException(nameof(d1));
-            }
-
-            return new PureDependency<TResult>(
-                () => evaluate(d1.Value),
+            dependencies = dependencies.ToArray();
+            return new PureDependency<T>(
+                () => evaluate(),
                 handler =>
                 {
-                    d1.MarkInvalidated += handler;
+                    for (var i = dependencies.Length - 1; i >= 0; i--)
+                    {
+                        dependencies[i].MarkInvalidated += handler;
+                    }
                 },
                 handler =>
                 {
-                    d1.MarkInvalidated -= handler;
+                    for (var i = dependencies.Length - 1; i >= 0; i--)
+                    {
+                        dependencies[i].MarkInvalidated -= handler;
+                    }
                 },
                 handler =>
                 {
-                    d1.SweepInvalidated += handler;
+                    for (var i = dependencies.Length - 1; i >= 0; i--)
+                    {
+                        dependencies[i].SweepInvalidated += handler;
+                    }
                 },
                 handler =>
                 {
-                    d1.SweepInvalidated -= handler;
-                });
-        }
-
-        /// <summary>
-        /// Creates a pure computation dependency.
-        /// </summary>
-        /// <typeparam name="T1">The type of the values from the first dependency.</typeparam>
-        /// <typeparam name="T2">The type of the values from the second dependency.</typeparam>
-        /// <typeparam name="TResult">The type of value that will be returned.</typeparam>
-        /// <param name="d1">The first dependency.</param>
-        /// <param name="d2">The second dependency.</param>
-        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
-        /// <returns>A dependency that will evaluate the specified function on-demand when any of its dependencies have changed.</returns>
-        public static PureDependency<TResult> Pure<T1, T2, TResult>(IDependency<T1> d1, IDependency<T2> d2, Func<T1, T2, TResult> evaluate)
-        {
-            if (d1 == null)
-            {
-                throw new ArgumentNullException(nameof(d1));
-            }
-
-            if (d2 == null)
-            {
-                throw new ArgumentNullException(nameof(d2));
-            }
-
-            return new PureDependency<TResult>(
-                () => evaluate(d1.Value, d2.Value),
-                handler =>
-                {
-                    d1.MarkInvalidated += handler;
-                    d2.MarkInvalidated += handler;
-                },
-                handler =>
-                {
-                    d1.MarkInvalidated -= handler;
-                    d2.MarkInvalidated -= handler;
-                },
-                handler =>
-                {
-                    d1.SweepInvalidated += handler;
-                    d2.SweepInvalidated += handler;
-                },
-                handler =>
-                {
-                    d1.SweepInvalidated -= handler;
-                    d2.SweepInvalidated -= handler;
-                });
-        }
-
-        /// <summary>
-        /// Creates a pure computation dependency.
-        /// </summary>
-        /// <typeparam name="T1">The type of the values from the first dependency.</typeparam>
-        /// <typeparam name="T2">The type of the values from the second dependency.</typeparam>
-        /// <typeparam name="T3">The type of the values from the third dependency.</typeparam>
-        /// <typeparam name="TResult">The type of value that will be returned.</typeparam>
-        /// <param name="d1">The first dependency.</param>
-        /// <param name="d2">The second dependency.</param>
-        /// <param name="d3">The third dependency.</param>
-        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
-        /// <returns>A dependency that will evaluate the specified function on-demand when any of its dependencies have changed.</returns>
-        public static PureDependency<TResult> Pure<T1, T2, T3, TResult>(IDependency<T1> d1, IDependency<T2> d2, IDependency<T3> d3, Func<T1, T2, T3, TResult> evaluate)
-        {
-            if (d1 == null)
-            {
-                throw new ArgumentNullException(nameof(d1));
-            }
-
-            if (d2 == null)
-            {
-                throw new ArgumentNullException(nameof(d2));
-            }
-
-            if (d3 == null)
-            {
-                throw new ArgumentNullException(nameof(d3));
-            }
-
-            return new PureDependency<TResult>(
-                () => evaluate(d1.Value, d2.Value, d3.Value),
-                handler =>
-                {
-                    d1.MarkInvalidated += handler;
-                    d2.MarkInvalidated += handler;
-                    d3.MarkInvalidated += handler;
-                },
-                handler =>
-                {
-                    d1.MarkInvalidated -= handler;
-                    d2.MarkInvalidated -= handler;
-                    d3.MarkInvalidated -= handler;
-                },
-                handler =>
-                {
-                    d1.SweepInvalidated += handler;
-                    d2.SweepInvalidated += handler;
-                    d3.SweepInvalidated += handler;
-                },
-                handler =>
-                {
-                    d1.SweepInvalidated -= handler;
-                    d2.SweepInvalidated -= handler;
-                    d3.SweepInvalidated -= handler;
+                    for (var i = dependencies.Length - 1; i >= 0; i--)
+                    {
+                        dependencies[i].SweepInvalidated -= handler;
+                    }
                 });
         }
 
