@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+  <g id="bristles">
+    <path d="M 20,25 15,40 40,40 40,39 A 12 20 0 0 1 30,25 Z" class="double-stroke" />
+    <path d="M 20,25 15,40 40,40 40,39 A 12 20 0 0 1 30,25 Z" />
+    <path d="M 19,39 22,26 M 33,39 A 12 20 0 0 1 28,26 M 28,39 A 12 20 0 0 1 25,26 M 24,39 A 20 20 0 0 1 23,33 " />
+  </g>
+  <g id="handle">
+    <path d="M 20,25 20,21 A 1 1 0 0 1 21,20 L 23,20 23,10 A 2 2 0 0 1 27,10 L 27,20 29,20 A 1 1 0 0 1 30,21 L 30,25" class="double-stroke" />
+    <path d="M 20,25 20,21 A 1 1 0 0 1 21,20 L 23,20 23,10 A 2 2 0 0 1 27,10 L 27,20 29,20 A 1 1 0 0 1 30,21 L 30,25 Z M 24.5,10.5 A 0.5 0.5 0 0 1 25.5,10.5 0.5 0.5 0 0 1 24.5,10.5" />
+  </g>
+  <g id="dust">
+    <path d="M 14,36 13,33 M 13,37 11,35 M 12,38 10,37" class="double-stroke" />
+    <path d="M 14,36 13,33 M 13,37 11,35 M 12,38 10,37" />
+  </g>
+  <defs>
+    <style type="text/css">
+      <![CDATA[
+          path
+          {
+              fill: white;
+              stroke: black;
+              stroke-width: 0.5;
+          }
+          path.double-stroke
+          {
+              stroke: white;
+              stroke-width: 1.0;
+          }
+      ]]>
+    </style>
+  </defs>
+</svg>
