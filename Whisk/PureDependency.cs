@@ -104,30 +104,18 @@ namespace Whisk
         {
             switch (this.state)
             {
-                case State.Dirty:
-                    break;
-
                 case State.Swept:
                     this.redundantDirtyCount++;
-
                     if (this.redundantDirtyCount >= UnsubscribeThreshold)
                     {
-                        this.UnsubscribeIfDirty();
+                        this.EnsureUnsubscribed();
                     }
 
                     break;
 
                 case State.Fresh:
                     this.state = State.Dirty;
-                    if (this.redundantDirtyCount >= UnsubscribeThreshold)
-                    {
-                        this.UnsubscribeIfDirty();
-                    }
-                    else
-                    {
-                        this.MarkInvalidated?.Invoke(this, EventArgs.Empty);
-                    }
-
+                    this.MarkInvalidated?.Invoke(this, EventArgs.Empty);
                     break;
             }
         }
@@ -140,21 +128,6 @@ namespace Whisk
                     this.state = State.Swept;
                     this.SweepInvalidated?.Invoke(this, EventArgs.Empty);
                     break;
-            }
-        }
-
-        private void UnsubscribeIfDirty()
-        {
-            if (this.state == State.Fresh)
-            {
-                if (this.subscribed)
-                {
-                    this.redundantDirtyCount = UnsubscribeThreshold;
-                }
-            }
-            else
-            {
-                this.EnsureUnsubscribed();
             }
         }
     }
