@@ -38,6 +38,15 @@ namespace Whisk
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
         public static PureDependency<T> Pure<T>(IDependency<object>[] dependencies, Func<T> evaluate)
         {
+            if (dependencies == null)
+            {
+                throw new ArgumentNullException(nameof(dependencies));
+            }
+            else if (dependencies.Any(s => s == null))
+            {
+                throw new ArgumentOutOfRangeException(nameof(dependencies));
+            }
+
             dependencies = dependencies.ToArray();
             return new PureDependency<T>(
                 evaluate,
@@ -77,6 +86,15 @@ namespace Whisk
         /// <param name="setters">The list of value updates to apply atomically.</param>
         public static void Set(params ValueUpdate[] setters)
         {
+            if (setters == null)
+            {
+                throw new ArgumentNullException(nameof(setters));
+            }
+            else if (setters.Any(s => s == null))
+            {
+                throw new ArgumentOutOfRangeException(nameof(setters));
+            }
+
             var i = 0;
             void SetNext()
             {
@@ -156,7 +174,7 @@ namespace Whisk
 
             public ValueUpdate(MutableDependency<T> dependency, T value)
             {
-                this.dependency = dependency;
+                this.dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
                 this.value = value;
             }
 

@@ -21,6 +21,22 @@ namespace Whisk.Tests
             new object[] { int.MinValue },
         };
 
+        [Fact]
+        public void Pure_WhenGivenANullDependenciesList_ThrowsArgumentNullException()
+        {
+            IDependency<object>[] dependencies = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Pure(dependencies, () => "OK"));
+            Assert.Equal(nameof(dependencies), exception.ParamName);
+        }
+
+        [Fact]
+        public void Pure_WhenGivenANullDependency_ThrowsArgumentOutOfRangeException()
+        {
+            IDependency<object>[] dependencies = { null };
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => D.Pure(dependencies, () => "OK"));
+            Assert.Equal(nameof(dependencies), exception.ParamName);
+        }
+
         [Theory]
         [MemberData(nameof(TestValues))]
         public void Set_WhenGivenADistinctValue_RaisesMarkBeforeSweep(int value)
@@ -90,6 +106,22 @@ namespace Whisk.Tests
         }
 
         [Fact]
+        public void Set_WhenGivenANullSettersList_ThrowsArgumentNullException()
+        {
+            D.ValueUpdate[] setters = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Set(setters));
+            Assert.Equal(nameof(setters), exception.ParamName);
+        }
+
+        [Fact]
+        public void Set_WhenGivenANullValueUpdate_ThrowsArgumentOutOfRangeException()
+        {
+            D.ValueUpdate[] setters = { null };
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => D.Set(setters));
+            Assert.Equal(nameof(setters), exception.ParamName);
+        }
+
+        [Fact]
         public void Set_WhenGivenMultipleValues_UpdatesTheValuesAtomically()
         {
             var first = D.Mutable("Reginald");
@@ -103,6 +135,15 @@ namespace Whisk.Tests
             }
 
             Assert.Equal(distinct, new HashSet<string> { "Reginald Dwight", "Elton John" });
+        }
+
+        [Fact]
+        public void Value_WhenGivenANullDependency_ThrowsArgumentNullException()
+        {
+            MutableDependency<int> dependency = default;
+
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Value(dependency, default));
+            Assert.Equal(nameof(dependency), exception.ParamName);
         }
 
         [Fact]
@@ -146,6 +187,38 @@ namespace Whisk.Tests
 
             Assert.Equal(3, invocations);
             Assert.Equal("OK3", lastValue);
+        }
+
+        [Fact]
+        public void Watch_WhenGivenANullAction_ThrowsArguemntNullException()
+        {
+            var dependency = D.Constant("OK");
+            Action<string> action = default;
+
+            var exception = Assert.Throws<ArgumentNullException>(() =>
+            {
+                using (dependency.Watch(action))
+                {
+                }
+            });
+            Assert.Equal(nameof(action), exception.ParamName);
+        }
+
+        [Fact]
+        public void Watch_WhenGivenANullDependency_ThrowsArguemntNullException()
+        {
+            IDependency<string> dependency = default;
+            var invocations = 0;
+            var action = new Action<string>(value => Interlocked.Increment(ref invocations));
+
+            var exception = Assert.Throws<ArgumentNullException>(() =>
+            {
+                using (dependency.Watch(action))
+                {
+                }
+            });
+            Assert.Equal(nameof(dependency), exception.ParamName);
+            Assert.Equal(0, invocations);
         }
     }
 }
