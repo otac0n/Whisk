@@ -40,5 +40,5 @@ subscription.Dispose();
 
 The expected output is:
 
-> Reginald Dwight
+> Reginald Dwight  
 > Elton John
