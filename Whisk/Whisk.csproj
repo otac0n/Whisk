@@ -7,7 +7,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <TargetFrameworks>net35;netcoreapp2.0</TargetFrameworks>
+    <Description>Whisk is a micro-framework for tracking and updating computational dependencies.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIconUrl>https://raw.github.com/otac0n/Whisk/master/Whisk.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/otac0n/Whisk</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>

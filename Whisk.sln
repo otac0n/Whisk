@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Strict.ruleset = Strict.ruleset
 		stylecop.json = stylecop.json
 		Tests.ruleset = Tests.ruleset
+		Whisk.png = Whisk.png
+		Whisk.svg = Whisk.svg
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whisk", "Whisk\Whisk.csproj", "{15293BD2-FB9A-4D89-A181-B83B0F472013}"

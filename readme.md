@@ -1,4 +1,4 @@
-Whisk
+Whisk <img src="Whisk.svg" width="42" height="42" />
 =======
 
 Whisk is a micro-framework for tracking and updating computational dependencies.
@@ -29,10 +29,13 @@ var last = D.Mutable("Dwight");
 var full = D.Pure(new[] { first, last }, () => $"{first.Value} {last.Value}");
 
 // Watch the full name and output all values to the console.
-full.Watch(Console.WriteLine);
+var subscription = full.Watch(Console.WriteLine);
 
 // Atomically update the first and last name at the same time.
 D.Set(D.Value(first, "Elton"), D.Value(last, "John"));
+
+// Stop watching the full name.
+subscription.Dispose();
 ```
 
 The expected output is:
