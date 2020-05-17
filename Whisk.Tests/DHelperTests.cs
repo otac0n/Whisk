@@ -106,7 +106,7 @@ namespace Whisk.Tests
         }
 
         [Fact]
-        public void Watch_GivenAConstantDependency_InvokesTheActionOnce()
+        public void Watch_WhenGivenAConstantDependency_InvokesTheActionOnce()
         {
             var dependency = D.Constant("OK");
             var invocations = 0;
@@ -126,7 +126,7 @@ namespace Whisk.Tests
         }
 
         [Fact]
-        public void Watch_GivenAMutableDependency_InvokesTheActionForEachUpdate()
+        public void Watch_WhenGivenAMutableDependency_InvokesTheActionForEachUpdate()
         {
             var dependency = D.Mutable("OK1");
             var invocations = 0;
