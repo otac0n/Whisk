@@ -40,7 +40,7 @@ namespace Whisk
         {
             dependencies = dependencies.ToArray();
             return new PureDependency<T>(
-                () => evaluate(),
+                evaluate,
                 handler =>
                 {
                     for (var i = dependencies.Length - 1; i >= 0; i--)
