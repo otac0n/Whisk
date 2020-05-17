@@ -18,7 +18,7 @@ Getting Started
 Example
 -------
 
-This C# snippet shows how to create mutable value, subscribe to changes, and make changes atomically:
+This C# snippet shows how to create mutable values, subscribe to changes, and make changes atomically:
 
 ```C#
 // Create mutable containers for first and last name.
@@ -26,15 +26,15 @@ var first = D.Mutable("Reginald");
 var last = D.Mutable("Dwight");
 
 // Create a full-name dependency that will track the first and last name.
-var full = D.Pure(new[] { first, last }, () => $"{first.Value} {last.Value}");
+var full = D.Pure(D.All(first, last), () => $"{first.Value} {last.Value}");
 
-// Watch the full name and output all values to the console.
+// Watch the full name and print all values to the console.
 var subscription = full.Watch(Console.WriteLine);
 
 // Atomically update the first and last name at the same time.
 D.Set(D.Value(first, "Elton"), D.Value(last, "John"));
 
-// Stop watching the full name.
+// Stop printing the full name to console.
 subscription.Dispose();
 ```
 

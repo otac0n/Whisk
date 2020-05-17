@@ -23,19 +23,27 @@ namespace Whisk.Tests
         };
 
         [Fact]
-        public void Pure_WhenGivenANullDependenciesList_ThrowsArgumentNullException()
+        public void All_WhenGivenANullDependenciesList_ThrowsArgumentNullException()
         {
-            IDependency<object>[] dependencies = null;
-            var exception = Assert.Throws<ArgumentNullException>(() => D.Pure(dependencies, () => "OK"));
+            IDependency[] dependencies = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.All(dependencies));
             Assert.Equal(nameof(dependencies), exception.ParamName);
         }
 
         [Fact]
-        public void Pure_WhenGivenANullDependency_ThrowsArgumentOutOfRangeException()
+        public void All_WhenGivenANullDependency_ThrowsArgumentOutOfRangeException()
         {
-            IDependency<object>[] dependencies = { null };
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => D.Pure(dependencies, () => "OK"));
+            IDependency[] dependencies = { null };
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => D.All(dependencies));
             Assert.Equal(nameof(dependencies), exception.ParamName);
+        }
+
+        [Fact]
+        public void Pure_WhenGivenANullDependency_ThrowsArgumentNullException()
+        {
+            IDependency dependency = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Pure(dependency, () => "OK"));
+            Assert.Equal(nameof(dependency), exception.ParamName);
         }
 
         [Theory]
@@ -127,7 +135,7 @@ namespace Whisk.Tests
         {
             var first = D.Mutable("Reginald");
             var last = D.Mutable("Dwight");
-            var full = D.Pure(new[] { first, last }, () => $"{first.Value} {last.Value}");
+            var full = D.Pure(D.All(first, last), () => $"{first.Value} {last.Value}");
 
             var distinct = new HashSet<string>();
             using (full.Watch(v => distinct.Add(v)))

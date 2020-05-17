@@ -5,10 +5,9 @@ namespace Whisk
     using System;
 
     /// <summary>
-    /// The common interface for dependencies.
+    /// The interface for dependencies which allows for mark/sweep notification without type information.
     /// </summary>
-    /// <typeparam name="T">The type of object the dependency is tracking.</typeparam>
-    public interface IDependency<out T>
+    public interface IDependency
     {
         /// <summary>
         /// Event raised to mark consumers of a dependency as stale.
@@ -23,10 +22,5 @@ namespace Whisk
         /// Event raised to allow consumers to perform updates after all stale values have been marked.
         /// </summary>
         event EventHandler<EventArgs> SweepInvalidated;
-
-        /// <summary>
-        /// Gets the value of the dependency.
-        /// </summary>
-        T Value { get; }
     }
 }

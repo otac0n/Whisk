@@ -11,24 +11,18 @@ namespace Whisk
     public class PureDependency<T> : IDependency<T>
     {
         private const int UnsubscribeThreshold = 1;
-        private readonly Action<EventHandler<EventArgs>> addMark;
-        private readonly Action<EventHandler<EventArgs>> addSweep;
+        private readonly IDependency dependency;
         private readonly Func<T> evaluate;
-        private readonly Action<EventHandler<EventArgs>> removeMark;
-        private readonly Action<EventHandler<EventArgs>> removeSweep;
         private int redundantDirtyCount;
         private State state;
         private bool subscribed;
         private T value;
 
-        internal PureDependency(Func<T> evaluate, Action<EventHandler<EventArgs>> addMark, Action<EventHandler<EventArgs>> removeMark, Action<EventHandler<EventArgs>> addSweep, Action<EventHandler<EventArgs>> removeSweep)
+        internal PureDependency(IDependency dependency, Func<T> evaluate)
         {
             this.state = State.Swept;
+            this.dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
             this.evaluate = evaluate ?? throw new ArgumentNullException(nameof(evaluate));
-            this.addMark = addMark ?? throw new ArgumentNullException(nameof(addMark));
-            this.removeMark = removeMark ?? throw new ArgumentNullException(nameof(removeMark));
-            this.addSweep = addSweep ?? throw new ArgumentNullException(nameof(addSweep));
-            this.removeSweep = removeSweep ?? throw new ArgumentNullException(nameof(removeSweep));
         }
 
         /// <inheritdoc/>
@@ -80,8 +74,8 @@ namespace Whisk
         {
             if (!this.subscribed)
             {
-                this.addMark(this.Mark);
-                this.addSweep(this.Sweep);
+                this.dependency.MarkInvalidated += this.Mark;
+                this.dependency.SweepInvalidated += this.Sweep;
                 this.subscribed = true;
                 this.redundantDirtyCount = 0;
             }
@@ -91,8 +85,8 @@ namespace Whisk
         {
             if (this.subscribed)
             {
-                this.removeMark(this.Mark);
-                this.removeSweep(this.Sweep);
+                this.dependency.MarkInvalidated -= this.Mark;
+                this.dependency.SweepInvalidated -= this.Sweep;
                 this.subscribed = false;
                 this.redundantDirtyCount = 0;
                 this.value = default;

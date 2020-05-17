@@ -13,6 +13,13 @@ namespace Whisk
     public static class D
     {
         /// <summary>
+        /// Creates a composite dependency from other dependencies that can be watched for changes.
+        /// </summary>
+        /// <param name="dependencies">The dependencies that will be combined into a single dependency.</param>
+        /// <returns>The composite dependency.</returns>
+        public static IDependency All(params IDependency[] dependencies) => new CompositeDependency(dependencies);
+
+        /// <summary>
         /// Creates a constant dependency.
         /// </summary>
         /// <typeparam name="T">The static type of the value stored.</typeparam>
@@ -33,52 +40,10 @@ namespace Whisk
         /// Creates a pure computation dependency.
         /// </summary>
         /// <typeparam name="T">The static type of value that will be returned.</typeparam>
-        /// <param name="dependencies">The dependency.</param>
+        /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
-        public static PureDependency<T> Pure<T>(IDependency<object>[] dependencies, Func<T> evaluate)
-        {
-            if (dependencies == null)
-            {
-                throw new ArgumentNullException(nameof(dependencies));
-            }
-            else if (dependencies.Any(s => s == null))
-            {
-                throw new ArgumentOutOfRangeException(nameof(dependencies));
-            }
-
-            dependencies = dependencies.ToArray();
-            return new PureDependency<T>(
-                evaluate,
-                handler =>
-                {
-                    for (var i = dependencies.Length - 1; i >= 0; i--)
-                    {
-                        dependencies[i].MarkInvalidated += handler;
-                    }
-                },
-                handler =>
-                {
-                    for (var i = dependencies.Length - 1; i >= 0; i--)
-                    {
-                        dependencies[i].MarkInvalidated -= handler;
-                    }
-                },
-                handler =>
-                {
-                    for (var i = dependencies.Length - 1; i >= 0; i--)
-                    {
-                        dependencies[i].SweepInvalidated += handler;
-                    }
-                },
-                handler =>
-                {
-                    for (var i = dependencies.Length - 1; i >= 0; i--)
-                    {
-                        dependencies[i].SweepInvalidated -= handler;
-                    }
-                });
-        }
+        public static PureDependency<T> Pure<T>(IDependency dependency, Func<T> evaluate) => new PureDependency<T>(dependency, evaluate);
 
         /// <summary>
         /// Atomically processes the <see cref="ValueUpdate">value updates</see> obtained by calling <see cref="Value{T}(MutableDependency{T}, T)"/>.
