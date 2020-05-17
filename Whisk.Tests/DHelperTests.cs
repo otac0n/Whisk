@@ -5,6 +5,7 @@ namespace Whisk.Tests
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using Moq;
     using Xunit;
 
     public class DHelperTests
@@ -219,6 +220,23 @@ namespace Whisk.Tests
             });
             Assert.Equal(nameof(dependency), exception.ParamName);
             Assert.Equal(0, invocations);
+        }
+
+        [Fact]
+        public void Watch_WhenUnsubscribingMultipleTimes_OnlyInvokesRemoveOnce()
+        {
+            var mock = new Mock<IDependency<string>>();
+            mock.SetupAdd(m => m.SweepInvalidated += It.IsAny<EventHandler<EventArgs>>()).Verifiable();
+            mock.SetupRemove(m => m.SweepInvalidated -= It.IsAny<EventHandler<EventArgs>>()).Verifiable();
+            var dependency = mock.Object;
+
+            using (var subscription = dependency.Watch(_ => { }))
+            {
+                subscription.Dispose();
+            }
+
+            mock.VerifyAdd(m => m.SweepInvalidated += It.IsAny<EventHandler<EventArgs>>(), Times.Once);
+            mock.VerifyRemove(m => m.SweepInvalidated -= It.IsAny<EventHandler<EventArgs>>(), Times.Once);
         }
     }
 }
