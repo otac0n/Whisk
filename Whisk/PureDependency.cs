@@ -25,10 +25,10 @@ namespace Whisk
         {
             this.state = State.Swept;
             this.evaluate = evaluate ?? throw new ArgumentNullException(nameof(evaluate));
-            this.addMark = addMark;
-            this.removeMark = removeMark;
-            this.addSweep = addSweep;
-            this.removeSweep = removeSweep;
+            this.addMark = addMark ?? throw new ArgumentNullException(nameof(addMark));
+            this.removeMark = removeMark ?? throw new ArgumentNullException(nameof(removeMark));
+            this.addSweep = addSweep ?? throw new ArgumentNullException(nameof(addSweep));
+            this.removeSweep = removeSweep ?? throw new ArgumentNullException(nameof(removeSweep));
         }
 
         /// <inheritdoc/>

@@ -5,6 +5,7 @@ namespace Whisk.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using Xunit;
 
     public class PureDependencyTests
@@ -74,6 +75,73 @@ namespace Whisk.Tests
             Assert.Equal("<<OK>>", pure.Value);
             mutable.Value = "changed";
             Assert.Equal("<<CHANGED>>", pure.Value);
+        }
+
+        [Fact]
+        public void Value_WhenInvokedRepeatedly_OnlyInvokesTheEvaluationFunctionOnce()
+        {
+            var invocations = 0;
+            var evaluate = new Func<string>(() =>
+            {
+                Interlocked.Increment(ref invocations);
+                return "OK";
+            });
+            var depenedency = new PureDependency<string>(evaluate, _ => { }, _ => { }, _ => { }, _ => { });
+
+            var values = new HashSet<string>
+            {
+                depenedency.Value,
+                depenedency.Value,
+                depenedency.Value,
+            };
+
+            Assert.Equal(1, invocations);
+            Assert.Equal("OK", values.Single());
+        }
+
+        [Fact]
+        public void When_GivenANullAddMarkFunction_ThrowsArgumentNullException()
+        {
+            var marks = new HandlerList();
+            var sweeps = new HandlerList();
+            var exception = Assert.Throws<ArgumentNullException>(() => new PureDependency<string>(() => "OK", null, marks.Remove, sweeps.Add, sweeps.Remove));
+            Assert.Equal("addMark", exception.ParamName);
+        }
+
+        [Fact]
+        public void When_GivenANullAddSweepFunction_ThrowsArgumentNullException()
+        {
+            var marks = new HandlerList();
+            var sweeps = new HandlerList();
+            var exception = Assert.Throws<ArgumentNullException>(() => new PureDependency<string>(() => "OK", marks.Add, marks.Remove, null, sweeps.Remove));
+            Assert.Equal("addSweep", exception.ParamName);
+        }
+
+        [Fact]
+        public void When_GivenANullEvaluateFunction_ThrowsArgumentNullException()
+        {
+            var marks = new HandlerList();
+            var sweeps = new HandlerList();
+            var exception = Assert.Throws<ArgumentNullException>(() => new PureDependency<string>(null, marks.Add, marks.Remove, sweeps.Add, sweeps.Remove));
+            Assert.Equal("evaluate", exception.ParamName);
+        }
+
+        [Fact]
+        public void When_GivenANullRemoveMarkFunction_ThrowsArgumentNullException()
+        {
+            var marks = new HandlerList();
+            var sweeps = new HandlerList();
+            var exception = Assert.Throws<ArgumentNullException>(() => new PureDependency<string>(() => "OK", marks.Add, null, sweeps.Add, sweeps.Remove));
+            Assert.Equal("removeMark", exception.ParamName);
+        }
+
+        [Fact]
+        public void When_GivenANullRemoveSweepFunction_ThrowsArgumentNullException()
+        {
+            var marks = new HandlerList();
+            var sweeps = new HandlerList();
+            var exception = Assert.Throws<ArgumentNullException>(() => new PureDependency<string>(() => "OK", marks.Add, marks.Remove, sweeps.Add, null));
+            Assert.Equal("removeSweep", exception.ParamName);
         }
 
         private class HandlerList : List<EventHandler<EventArgs>>
