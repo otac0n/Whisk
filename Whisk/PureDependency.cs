@@ -33,9 +33,10 @@ namespace Whisk
 
         private enum State : byte
         {
-            Swept = 0,
-            Fresh,
-            Dirty,
+            Dirty = 0b00,
+            Swept = 0b01,
+            Observed = 0b10,
+            Fresh = 0b11,
         }
 
         /// <inheritdoc/>
@@ -43,11 +44,11 @@ namespace Whisk
         {
             get
             {
-                if (this.state != State.Fresh)
+                if ((this.state & State.Observed) != State.Observed)
                 {
                     this.EnsureSubscribed();
                     this.value = this.evaluate();
-                    this.state = State.Fresh;
+                    this.state |= State.Observed;
                     this.redundantDirtyCount = 0;
                 }
 
@@ -67,7 +68,7 @@ namespace Whisk
         public bool TryPeek(out T value)
         {
             value = this.value;
-            return this.state == State.Fresh;
+            return (this.state & State.Observed) == State.Observed;
         }
 
         private void EnsureSubscribed()
@@ -107,6 +108,7 @@ namespace Whisk
 
                     break;
 
+                case State.Observed:
                 case State.Fresh:
                     this.state = State.Dirty;
                     this.MarkInvalidated?.Invoke(this, EventArgs.Empty);
@@ -119,7 +121,8 @@ namespace Whisk
             switch (this.state)
             {
                 case State.Dirty:
-                    this.state = State.Swept;
+                case State.Observed:
+                    this.state |= State.Swept;
                     this.SweepInvalidated?.Invoke(this, EventArgs.Empty);
                     break;
             }
