@@ -117,7 +117,7 @@ namespace Whisk.Tests
         [Fact]
         public void Set_WhenGivenANullSettersList_ThrowsArgumentNullException()
         {
-            D.ValueUpdate[] setters = null;
+            ValueUpdate[] setters = null;
             var exception = Assert.Throws<ArgumentNullException>(() => D.Set(setters));
             Assert.Equal(nameof(setters), exception.ParamName);
         }
@@ -125,7 +125,7 @@ namespace Whisk.Tests
         [Fact]
         public void Set_WhenGivenANullValueUpdate_ThrowsArgumentOutOfRangeException()
         {
-            D.ValueUpdate[] setters = { null };
+            ValueUpdate[] setters = { null };
             var exception = Assert.Throws<ArgumentOutOfRangeException>(() => D.Set(setters));
             Assert.Equal(nameof(setters), exception.ParamName);
         }

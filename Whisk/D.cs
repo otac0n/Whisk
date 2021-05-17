@@ -8,7 +8,6 @@ namespace Whisk
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Threading;
 
     /// <summary>
     /// Static class containing utility methods for creating <see cref="IDependency{T}">dependencies</see>.
@@ -135,45 +134,6 @@ namespace Whisk
             action(dependency.Value);
             dependency.SweepInvalidated += Handler;
             return new DisposeAction(() => dependency.SweepInvalidated -= Handler);
-        }
-
-        /// <summary>
-        /// Contains a tuple of a <see cref="MutableDependency{T}"/> and a value, but erases the type information.
-        /// This allows them to be managed as a collection.
-        /// </summary>
-        public abstract class ValueUpdate
-        {
-            internal ValueUpdate()
-            {
-            }
-
-            internal abstract void SetValue(Action rest);
-        }
-
-        private class DisposeAction : IDisposable
-        {
-            private Action action;
-
-            public DisposeAction(Action action)
-            {
-                this.action = action;
-            }
-
-            public void Dispose() => Interlocked.Exchange(ref this.action, null)?.Invoke();
-        }
-
-        private class ValueUpdate<T> : ValueUpdate
-        {
-            private readonly MutableDependency<T> dependency;
-            private readonly T value;
-
-            public ValueUpdate(MutableDependency<T> dependency, T value)
-            {
-                this.dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
-                this.value = value;
-            }
-
-            internal override void SetValue(Action rest) => this.dependency.Set(this.value, rest);
         }
 
         /// <summary>
