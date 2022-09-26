@@ -16,7 +16,7 @@ namespace Whisk.Tests
             {
             }
 
-            var dependecy = D.Property(stub, a => a.Name).Change((a, b) => a.NameChangedClassic += b, (a, b) => a.NameChangedClassic -= b);
+            var dependecy = D.Property(stub, a => a.Name).Changed((a, b) => a.NameChangedClassic += b, (a, b) => a.NameChangedClassic -= b);
 
             dependecy.MarkInvalidated += MarkInvalidated;
             Assert.True(stub.HasSubscribers);
@@ -29,7 +29,7 @@ namespace Whisk.Tests
         {
             var stub = new PropertyChangeStub("OK");
 
-            var dependecy = D.Property(stub, a => a.Name).Change((a, b) => a.NameChangedClassic += b, (a, b) => a.NameChangedClassic -= b);
+            var dependecy = D.Property(stub, a => a.Name).Changed((a, b) => a.NameChangedClassic += b, (a, b) => a.NameChangedClassic -= b);
 
             Assert.Equal("OK", dependecy.Value);
         }
@@ -42,7 +42,7 @@ namespace Whisk.Tests
             {
             }
 
-            var dependecy = D.Property(stub, a => a.Name).Change((a, b) => a.NameChangedClassic += b, (a, b) => a.NameChangedClassic -= b);
+            var dependecy = D.Property(stub, a => a.Name).Changed((a, b) => a.NameChangedClassic += b, (a, b) => a.NameChangedClassic -= b);
 
             dependecy.SweepInvalidated += SweepInvalidated;
             Assert.True(stub.HasSubscribers);
@@ -54,7 +54,7 @@ namespace Whisk.Tests
         public void NameChangedClassic_WithDifferentValueWhenSubscribed_NotifiesSubscribersOfUpdatedValue()
         {
             var stub = new PropertyChangeStub("Clark Kent");
-            var dependecy = D.Property(stub, a => a.Name).Change((a, b) => a.NameChangedClassic += b, (a, b) => a.NameChangedClassic -= b);
+            var dependecy = D.Property(stub, a => a.Name).Changed((a, b) => a.NameChangedClassic += b, (a, b) => a.NameChangedClassic -= b);
             string updated = null;
             using (var subscription = D.Watch(dependecy, name => updated = name))
             {
@@ -71,7 +71,7 @@ namespace Whisk.Tests
             {
             }
 
-            var dependecy = D.Property(stub, a => a.Name).Change<EventArgs>((a, b) => a.OnNameChanged += b, (a, b) => a.OnNameChanged -= b);
+            var dependecy = D.Property(stub, a => a.Name).Changed<EventArgs>((a, b) => a.OnNameChanged += b, (a, b) => a.OnNameChanged -= b);
 
             dependecy.MarkInvalidated += MarkInvalidated;
             Assert.True(stub.HasSubscribers);
@@ -84,7 +84,7 @@ namespace Whisk.Tests
         {
             var stub = new PropertyChangeStub("OK");
 
-            var dependecy = D.Property(stub, a => a.Name).Change<EventArgs>((a, b) => a.OnNameChanged += b, (a, b) => a.OnNameChanged -= b);
+            var dependecy = D.Property(stub, a => a.Name).Changed<EventArgs>((a, b) => a.OnNameChanged += b, (a, b) => a.OnNameChanged -= b);
 
             Assert.Equal("OK", dependecy.Value);
         }
@@ -97,7 +97,7 @@ namespace Whisk.Tests
             {
             }
 
-            var dependecy = D.Property(stub, a => a.Name).Change<EventArgs>((a, b) => a.OnNameChanged += b, (a, b) => a.OnNameChanged -= b);
+            var dependecy = D.Property(stub, a => a.Name).Changed<EventArgs>((a, b) => a.OnNameChanged += b, (a, b) => a.OnNameChanged -= b);
 
             dependecy.SweepInvalidated += SweepInvalidated;
             Assert.True(stub.HasSubscribers);
@@ -109,7 +109,7 @@ namespace Whisk.Tests
         public void OnNameChanged_WithDifferentValueWhenSubscribed_NotifiesSubscribersOfUpdatedValue()
         {
             var stub = new PropertyChangeStub("Clark Kent");
-            var dependecy = D.Property(stub, a => a.Name).Change<EventArgs>((a, b) => a.OnNameChanged += b, (a, b) => a.OnNameChanged -= b);
+            var dependecy = D.Property(stub, a => a.Name).Changed<EventArgs>((a, b) => a.OnNameChanged += b, (a, b) => a.OnNameChanged -= b);
             string updated = null;
             using (var subscription = D.Watch(dependecy, name => updated = name))
             {
@@ -126,7 +126,7 @@ namespace Whisk.Tests
             {
             }
 
-            var dependecy = D.Property(stub, a => a.Name).Change((a, b) => a.PropertyChanged += b, (a, b) => a.PropertyChanged -= b);
+            var dependecy = D.PropertyChanged(stub, a => a.Name);
 
             dependecy.MarkInvalidated += MarkInvalidated;
             Assert.True(stub.HasSubscribers);
@@ -139,7 +139,7 @@ namespace Whisk.Tests
         {
             var stub = new PropertyChangeStub("OK");
 
-            var dependecy = D.Property(stub, a => a.Name).Change((a, b) => a.PropertyChanged += b, (a, b) => a.PropertyChanged -= b);
+            var dependecy = D.PropertyChanged(stub, a => a.Name);
 
             Assert.Equal("OK", dependecy.Value);
         }
@@ -152,7 +152,7 @@ namespace Whisk.Tests
             {
             }
 
-            var dependecy = D.Property(stub, a => a.Name).Change((a, b) => a.PropertyChanged += b, (a, b) => a.PropertyChanged -= b);
+            var dependecy = D.PropertyChanged(stub, a => a.Name);
 
             dependecy.SweepInvalidated += SweepInvalidated;
             Assert.True(stub.HasSubscribers);
@@ -164,7 +164,7 @@ namespace Whisk.Tests
         public void PropertyChanged_WithDifferentValueWhenSubscribed_NotifiesSubscribersOfUpdatedValue()
         {
             var stub = new PropertyChangeStub("Clark Kent");
-            var dependecy = D.Property(stub, a => a.Name).Change((a, b) => a.PropertyChanged += b, (a, b) => a.PropertyChanged -= b);
+            var dependecy = D.PropertyChanged(stub, a => a.Name);
             string updated = null;
             using (var subscription = D.Watch(dependecy, name => updated = name))
             {
@@ -177,7 +177,7 @@ namespace Whisk.Tests
         public void PropertyChanged_WithFromOtherPropertyWhenSubscribed_DoesNotNotifySubscribersOfChange()
         {
             var stub = new PropertyChangeStub("Clark Kent");
-            var dependecy = D.Property(stub, a => a.Name).Change((a, b) => a.PropertyChanged += b, (a, b) => a.PropertyChanged -= b);
+            var dependecy = D.PropertyChanged(stub, a => a.Name);
 
             dependecy.SweepInvalidated += SweepInvalidated;
             void SweepInvalidated(object sender, EventArgs e)
@@ -188,7 +188,7 @@ namespace Whisk.Tests
             stub.InvokeOtherPropertyChanged();
         }
 
-        internal class PropertyChangeStub : INotifyPropertyChanged
+        internal class PropertyChangeStub : INotifyPropertyChanged, INotifyPropertyChanging
         {
             private string name;
 
@@ -203,7 +203,9 @@ namespace Whisk.Tests
 
             public event PropertyChangedEventHandler PropertyChanged;
 
-            public bool HasSubscribers => this.OnNameChanged != null || this.NameChangedClassic != null || this.PropertyChanged != null;
+            public event PropertyChangingEventHandler PropertyChanging;
+
+            public bool HasSubscribers => this.OnNameChanged != null || this.NameChangedClassic != null || this.PropertyChanged != null || this.PropertyChanging != null;
 
             public string Name
             {
@@ -211,6 +213,7 @@ namespace Whisk.Tests
 
                 set
                 {
+                    this.PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(nameof(this.Name)));
                     this.name = value;
                     this.OnNameChanged?.Invoke(this, new EventArgs());
                     this.NameChangedClassic?.Invoke(this, new EventArgs());
@@ -220,6 +223,7 @@ namespace Whisk.Tests
 
             public void InvokeOtherPropertyChanged()
             {
+                this.PropertyChanging?.Invoke(this, new PropertyChangingEventArgs("OtherProperty"));
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("OtherProperty"));
             }
         }

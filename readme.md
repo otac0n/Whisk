@@ -16,7 +16,7 @@ Getting Started
     PM> Install-Package Whisk
 
 Example
--------
+=======
 
 This C# snippet shows how to create mutable values, subscribe to changes, and make changes atomically:
 
@@ -42,3 +42,32 @@ The expected output is:
 
 > Reginald Dwight  
 > Elton John
+
+Integration
+-----------
+
+Constant
+========
+
+* Create a constant:
+
+    ```C#
+    var maxHumanLifeSpan = D.Constant(TimeSpan.FromYears(126));
+    var minMarginalTaxRate = D.Constant(0.01);
+    ```
+
+Property Changed
+=================
+
+* Bind to a property change event:
+    ```
+    var form = new Form();
+    var text = D.Property(form, f => f.Text).Changed((f, e) => f.TextChanged += e, (f, e) => f.TextChanged += e);
+    ```
+
+* Bind to an `INotifyPropertyChaged` object.
+    ```
+    var obj = new MyReactiveObject();
+    var name = D.PropertyChanged(obj, o => o.Name);
+    ```
+

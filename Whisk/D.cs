@@ -39,15 +39,33 @@ namespace Whisk
         public static MutableDependency<T> Mutable<T>(T value = default, IEqualityComparer<T> comparer = null) => new MutableDependency<T>(value, comparer);
 
         /// <summary>
-        /// Creates a property change dependency.
+        /// Creates a property change dependency using a notification event.
         /// </summary>
         /// <typeparam name="TSource">The type of the source object.</typeparam>
         /// <typeparam name="TValue">The type of the property being presented.</typeparam>
-        /// <param name="source">The initial value to store.</param>
+        /// <param name="source">The source object with mutable properties.</param>
         /// <param name="get">Gets the current value of the property.</param>
         /// <returns>A <see cref="PropertyBuilder{TSource, TValue}"/> object that can be used to select and configure the required property dependency.</returns>
-        public static PropertyBuilder<TSource, TValue> Property<TSource, TValue>(TSource source, Expression<Func<TSource, TValue>> get)
+        public static PropertyBuilder<TSource, TValue> Property<TSource, TValue>(TSource source, Func<TSource, TValue> get)
             where TSource : class
+        {
+            return new PropertyBuilder<TSource, TValue>(source, get);
+        }
+
+        /// <summary>
+        /// Creates a property change dependency using <see cref="INotifyPropertyChanged"/>.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the source object.</typeparam>
+        /// <typeparam name="TValue">The type of the property being presented.</typeparam>
+        /// <param name="source">The source object with mutable properties.</param>
+        /// <param name="get">Gets the current value of the property.</param>
+        /// <returns>A <see cref="PropertyChangedEventHandlerDependency{TSource, TValue}"/> presenting the specified property from the source.</returns>
+        /// <remarks>
+        /// To avoid any performance penalty, consider directly invoking the desired object constructor with all of the type parameters specified.
+        /// These overloads are provided for developer convenience.
+        /// </remarks>
+        public static IDependency<TValue> PropertyChanged<TSource, TValue>(this TSource source, Expression<Func<TSource, TValue>> get)
+            where TSource : class, INotifyPropertyChanged
         {
             if (get == null)
             {
@@ -56,8 +74,7 @@ namespace Whisk
 
             if (get.Body is MemberExpression getMember && getMember.Expression == get.Parameters[0] && (getMember.Member is FieldInfo || getMember.Member is PropertyInfo))
             {
-                var propertyName = getMember.Member.Name;
-                return new PropertyBuilder<TSource, TValue>(source, get.Compile(), propertyName);
+                return PropertyDependencyFactory<TSource, TValue>.Factory(source, get.Compile(), getMember.Member.Name);
             }
             else
             {
@@ -139,24 +156,18 @@ namespace Whisk
         /// <summary>
         /// A builder supporting simpler C# syntax.
         /// </summary>
-        /// <remarks>
-        /// To avoid any performance penalty, consider directly invoking the desired object constructor with all of the type parameters specified.
-        /// These overloads are provided for developer convenience.
-        /// </remarks>
         /// <typeparam name="TSource">The type of the source object.</typeparam>
         /// <typeparam name="TValue">The type of the property being presented.</typeparam>
         public struct PropertyBuilder<TSource, TValue>
             where TSource : class
         {
             private readonly Func<TSource, TValue> get;
-            private readonly string propertyName;
             private readonly TSource source;
 
-            internal PropertyBuilder(TSource source, Func<TSource, TValue> get, string propertyName)
+            internal PropertyBuilder(TSource source, Func<TSource, TValue> get)
             {
                 this.source = source ?? throw new ArgumentNullException(nameof(source));
                 this.get = get ?? throw new ArgumentNullException(nameof(get));
-                this.propertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
             }
 
             /// <summary>
@@ -165,8 +176,8 @@ namespace Whisk
             /// <typeparam name="TEventArgs">The type of <see cref="EventArgs"/> that the notification uses.</typeparam>
             /// <param name="subscribe">Subscribes to the OnChange notifications for the property.</param>
             /// <param name="unsubscribe">Unsubscribes from the OnChange notifications for the property.</param>
-            /// <returns>A <see cref="BasePropertyChangeDependency{TSource, TValue}"/> presenting the specified property from the source.</returns>
-            public EventHandlerPropertyChangeDependency<TSource, TValue, TEventArgs> Change<TEventArgs>(Action<TSource, EventHandler<TEventArgs>> subscribe, Action<TSource, EventHandler<TEventArgs>> unsubscribe)
+            /// <returns>An <see cref="EventHandlerPropertyChangeDependency{TSource, TValue, TEventArgs}"/> presenting the specified property from the source.</returns>
+            public EventHandlerPropertyChangeDependency<TSource, TValue, TEventArgs> Changed<TEventArgs>(Action<TSource, EventHandler<TEventArgs>> subscribe, Action<TSource, EventHandler<TEventArgs>> unsubscribe)
                 where TEventArgs : EventArgs
             {
                 return new EventHandlerPropertyChangeDependency<TSource, TValue, TEventArgs>(this.source, this.get, subscribe, unsubscribe);
@@ -177,22 +188,44 @@ namespace Whisk
             /// </summary>
             /// <param name="subscribe">Subscribes to the OnChange notifications for the property.</param>
             /// <param name="unsubscribe">Unsubscribes from the OnChange notifications for the property.</param>
-            /// <returns>A <see cref="BasePropertyChangeDependency{TSource, TValue}"/> presenting the specified property from the source.</returns>
-            public EventHandlerPropertyChangeDependency<TSource, TValue> Change(Action<TSource, EventHandler> subscribe, Action<TSource, EventHandler> unsubscribe)
+            /// <returns>An <see cref="EventHandlerPropertyChangeDependency{TSource, TValue}"/> presenting the specified property from the source.</returns>
+            public EventHandlerPropertyChangeDependency<TSource, TValue> Changed(Action<TSource, EventHandler> subscribe, Action<TSource, EventHandler> unsubscribe)
             {
                 return new EventHandlerPropertyChangeDependency<TSource, TValue>(this.source, this.get, subscribe, unsubscribe);
             }
+        }
 
-            /// <summary>
-            /// Creates a property change dependency.
-            /// </summary>
-            /// <param name="subscribe">Subscribes to the <see cref="INotifyPropertyChanged.PropertyChanged"/> notifications for the property.</param>
-            /// <param name="unsubscribe">Unsubscribes from the <see cref="INotifyPropertyChanged.PropertyChanged"/> notifications for the property.</param>
-            /// <returns>A <see cref="BasePropertyChangeDependency{TSource, TValue}"/> presenting the specified property from the source.</returns>
-            public PropertyChangedEventHandlerDependency<TSource, TValue> Change(Action<TSource, PropertyChangedEventHandler> subscribe, Action<TSource, PropertyChangedEventHandler> unsubscribe)
+        private static class PropertyDependencyFactory<TSource, TValue>
+            where TSource : class, INotifyPropertyChanged
+        {
+            static PropertyDependencyFactory()
             {
-                return new PropertyChangedEventHandlerDependency<TSource, TValue>(this.source, this.get, this.propertyName, subscribe, unsubscribe);
+                var sourceParam = Expression.Parameter(typeof(TSource), "source");
+                var getParam = Expression.Parameter(typeof(Func<TSource, TValue>), "get");
+                var propertyNameParam = Expression.Parameter(typeof(string), "propertyName");
+
+                var targetType = typeof(INotifyPropertyChanging).IsAssignableFrom(typeof(TSource))
+                    ? typeof(PropertyChangingChangedEventHandlerDependency<,>).MakeGenericType(typeof(TSource), typeof(TValue))
+                    : typeof(PropertyChangedEventHandlerDependency<TSource, TValue>);
+
+                var expr = Expression.Lambda<Func<TSource, Func<TSource, TValue>, string, IDependency<TValue>>>(
+                    Expression.New(
+                        targetType.GetConstructor(new Type[]
+                        {
+                            typeof(TSource),
+                            typeof(Func<TSource, TValue>),
+                            typeof(string),
+                        }),
+                        sourceParam,
+                        getParam,
+                        propertyNameParam),
+                    sourceParam,
+                    getParam,
+                    propertyNameParam);
+                Factory = expr.Compile();
             }
+
+            public static Func<TSource, Func<TSource, TValue>, string, IDependency<TValue>> Factory { get; }
         }
     }
 }
