@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <Authors>John Gietzen</Authors>
-    <Copyright>Copyright © 2020 $(Authors)</Copyright>
+    <Copyright>Copyright © 2024 $(Authors)</Copyright>
     <Product>Whisk</Product>
     <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
