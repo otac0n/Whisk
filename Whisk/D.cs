@@ -19,7 +19,8 @@ namespace Whisk
         /// </summary>
         /// <param name="dependencies">The dependencies that will be combined into a single dependency.</param>
         /// <returns>The composite dependency.</returns>
-        public static IDependency All(params IDependency[] dependencies) => new CompositeDependency(dependencies);
+        public static IDependency All(params IDependency[] dependencies) =>
+            dependencies.Length == 1 ? dependencies[0] : new CompositeDependency(dependencies);
 
         /// <summary>
         /// Creates a constant dependency.
