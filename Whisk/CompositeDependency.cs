@@ -9,7 +9,7 @@ namespace Whisk
         private bool subscribedMark = false;
         private bool subscribedSweep = false;
 
-        public CompositeDependency(IDependency[] dependencies)
+        public CompositeDependency(params IDependency[] dependencies)
         {
             if (dependencies == null)
             {
