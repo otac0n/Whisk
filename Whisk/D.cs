@@ -22,6 +22,14 @@ namespace Whisk
         public static IDependency All(params IDependency[] dependencies) => new CompositeDependency(dependencies);
 
         /// <summary>
+        /// Unwraps a nested dependency, subscribing to both the parent and child.
+        /// </summary>
+        /// <typeparam name="T">The value of the dependency.</typeparam>
+        /// <param name="nested">The wrapped dependency.</param>
+        /// <returns>An unwrapped dependency that will respond to changes in either the parent or child.</returns>
+        public static IDependency<T> Unwrap<T>(IDependency<IDependency<T>> nested) => new NestedDependency<T>(nested);
+
+        /// <summary>
         /// Creates a constant dependency.
         /// </summary>
         /// <typeparam name="T">The static type of the value stored.</typeparam>

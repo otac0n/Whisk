@@ -1,7 +1,6 @@
 namespace Whisk.Tests
 {
     using System.Collections.Generic;
-    using System.ComponentModel;
     using Xunit;
 
     public class NestedDependencyTests
@@ -10,7 +9,8 @@ namespace Whisk.Tests
         public void NestedDependency_WhenSubscribed_RespondsToNestedEvents()
         {
             var dependency = new MutableDependency<Helper>();
-            NestedDependency<Helper> output = D.Nested(() => dependency.Value.Property);
+
+            var output = D.Unwrap(D.Pure(dependency, v => v?.Demo));
 
             var recorded = new List<string>();
             using (output.Watch(recorded.Add))
@@ -18,43 +18,33 @@ namespace Whisk.Tests
                 var a = new Helper();
 
                 dependency.Value = a;
-                a.Property = "OK A";
+                a.Demo.Value = "OK A";
 
-                var b = new Helper
-                {
-                    Property = "OK B",
-                };
+                var b = new Helper();
+                b.Demo.Value = "OK B";
 
                 dependency.Value = b;
 
-                a.Property = "NAK";
+                a.Demo.Value = "NAK";
 
                 dependency.Value = null;
 
-                b.Property = "NAK";
+                b.Demo.Value = "NAK";
             }
 
-            Assert.Equal(recorded, new List<string> { null, "OK A", "OK B", null });
+            Assert.Equal(new List<string> { null, null, "OK A", "OK B", null }, recorded);
         }
 
-        private class Helper : INotifyPropertyChanged
+        private class Helper
         {
-            private string property;
+            private MutableDependency<string> demo;
 
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            public string Property
+            public Helper()
             {
-                get => this.property;
-                set
-                {
-                    if (this.property != value)
-                    {
-                        this.property = value;
-                        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Property)));
-                    }
-                }
+                this.demo = D.Mutable<string>();
             }
+
+            public MutableDependency<string> Demo => this.demo;
         }
     }
 }
