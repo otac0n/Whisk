@@ -93,6 +93,29 @@ namespace Whisk
         public static PureDependency<T> Pure<T>(IDependency dependency, Func<T> evaluate) => new PureDependency<T>(dependency, evaluate);
 
         /// <summary>
+        /// Creates a pure computation dependency.
+        /// </summary>
+        /// <typeparam name="TDependency">The static type of dependency passed-in.</typeparam>
+        /// <typeparam name="TValue">The static type of value that will be returned.</typeparam>
+        /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
+        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
+        /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
+        public static PureDependency<TValue> Pure<TDependency, TValue>(TDependency dependency, Func<TDependency, TValue> evaluate)
+            where TDependency : IDependency
+                => new PureDependency<TValue>(dependency, () => evaluate(dependency));
+
+        /// <summary>
+        /// Creates a pure computation dependency.
+        /// </summary>
+        /// <typeparam name="TIn">The static type of dependency passed-in.</typeparam>
+        /// <typeparam name="TOut">The static type of value that will be returned.</typeparam>
+        /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
+        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
+        /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
+        public static PureDependency<TOut> Pure<TIn, TOut>(IDependency<TIn> dependency, Func<TIn, TOut> evaluate)
+            => new PureDependency<TOut>(dependency, () => evaluate(dependency.Value));
+
+        /// <summary>
         /// Atomically processes the <see cref="ValueUpdate">value updates</see> obtained by calling <see cref="Value{T}(MutableDependency{T}, T)"/>.
         /// </summary>
         /// <param name="setters">The list of value updates to apply atomically.</param>
