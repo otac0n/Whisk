@@ -1,4 +1,4 @@
-// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
+﻿// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
 
 namespace Whisk
 {
@@ -20,7 +20,9 @@ namespace Whisk
         /// <param name="dependencies">The dependencies that will be combined into a single dependency.</param>
         /// <returns>The composite dependency.</returns>
         public static IDependency All(params IDependency[] dependencies) =>
-            dependencies.Length == 1 ? dependencies[0] : new CompositeDependency(dependencies);
+            (dependencies ?? throw new ArgumentNullException(nameof(dependencies))).Length == 1
+                ? dependencies[0] ?? throw new ArgumentOutOfRangeException(nameof(dependencies))
+                : new CompositeDependency(dependencies);
 
         /// <summary>
         /// Unwraps a nested dependency, subscribing to both the parent and child.
