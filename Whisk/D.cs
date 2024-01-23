@@ -110,7 +110,7 @@ namespace Whisk
         /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
-        public static PureDependency<TValue> Pure<TDependency, TValue>(TDependency dependency, Func<TDependency, TValue> evaluate)
+        public static PureDependency<TValue> Pure<TDependency, TValue>(this TDependency dependency, Func<TDependency, TValue> evaluate)
             where TDependency : IDependency
                 => new PureDependency<TValue>(dependency, () => evaluate(dependency));
 
@@ -122,8 +122,19 @@ namespace Whisk
         /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
-        public static PureDependency<TOut> Pure<TIn, TOut>(IDependency<TIn> dependency, Func<TIn, TOut> evaluate)
+        public static PureDependency<TOut> Pure<TIn, TOut>(this IDependency<TIn> dependency, Func<TIn, TOut> evaluate)
             => new PureDependency<TOut>(dependency, () => evaluate(dependency.Value));
+
+        /// <summary>
+        /// Creates a pure computation dependency.
+        /// </summary>
+        /// <typeparam name="TIn">The static type of dependency passed-in.</typeparam>
+        /// <typeparam name="TOut">The static type of value that will be returned.</typeparam>
+        /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
+        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
+        /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
+        public static PureDependency<TOut> Cast<TIn, TOut>(IDependency<TIn> dependency)
+            => new PureDependency<TOut>(dependency, () => (TOut)(object)dependency.Value);
 
         /// <summary>
         /// Atomically processes the <see cref="ValueUpdate">value updates</see> obtained by calling <see cref="Value{T}(MutableDependency{T}, T)"/>.
