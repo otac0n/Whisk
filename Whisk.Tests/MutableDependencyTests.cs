@@ -1,4 +1,4 @@
-// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
+﻿// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
 
 namespace Whisk.Tests
 {
@@ -22,14 +22,14 @@ namespace Whisk.Tests
 
         [Theory]
         [MemberData(nameof(TestValues))]
-        public void ctor_WhenGivenASpecificValue_ReturnsAMutableDependencyWithTheSpecifiedValue(int value)
+        public void Constructor_WhenGivenASpecificValue_ReturnsAMutableDependencyWithTheSpecifiedValue(int value)
         {
             var d = new MutableDependency<int>(value);
             Assert.Equal(value, d.Value);
         }
 
         [Fact]
-        public void ctor_WhenGivenDefaults_ReturnsAMutableDependencyWithThisDefaultValue()
+        public void Constructor_WhenGivenDefaults_ReturnsAMutableDependencyWithThisDefaultValue()
         {
             var d = new MutableDependency<int>();
             Assert.Equal(default, d.Value);

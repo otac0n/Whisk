@@ -43,14 +43,14 @@ namespace Whisk.Tests
         }
 
         [Fact]
-        public void When_GivenANullDependency_ThrowsArgumentNullException()
+        public void Constructor_WhenGivenANullDependency_ThrowsArgumentNullException()
         {
             var exception = Assert.Throws<ArgumentNullException>(() => new TransientDependency<string>(null, () => "OK"));
             Assert.Equal("dependency", exception.ParamName);
         }
 
         [Fact]
-        public void When_GivenANullEvaluateFunction_ThrowsArgumentNullException()
+        public void Constructor_WhenGivenANullEvaluateFunction_ThrowsArgumentNullException()
         {
             var exception = Assert.Throws<ArgumentNullException>(() => new TransientDependency<string>(new StubDependency(), null));
             Assert.Equal("evaluate", exception.ParamName);
