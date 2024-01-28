@@ -1,4 +1,4 @@
-namespace Whisk.Tests
+﻿namespace Whisk.Tests
 {
     using System.Collections.Generic;
     using Xunit;
@@ -8,43 +8,36 @@ namespace Whisk.Tests
         [Fact]
         public void NestedDependency_WhenSubscribed_RespondsToNestedEvents()
         {
-            var dependency = new MutableDependency<Helper>();
+            var dependency = D.Mutable<Helper>();
 
-            var output = D.Unwrap(D.Pure(dependency, v => v?.Demo));
+            var output = D.Unwrap(D.Transient(dependency, h => h?.Demo.Cast<int, int?>()));
 
-            var recorded = new List<string>();
+            var recorded = new List<int?>();
             using (output.Watch(recorded.Add))
             {
                 var a = new Helper();
 
                 dependency.Value = a;
-                a.Demo.Value = "OK A";
+                a.Demo.Value = 1;
 
                 var b = new Helper();
-                b.Demo.Value = "OK B";
+                b.Demo.Value = 2;
 
                 dependency.Value = b;
 
-                a.Demo.Value = "NAK";
+                a.Demo.Value = -1;
 
                 dependency.Value = null;
 
-                b.Demo.Value = "NAK";
+                b.Demo.Value = -1;
             }
 
-            Assert.Equal(new List<string> { null, null, "OK A", "OK B", null }, recorded);
+            Assert.Equal([null, 0, 1, 2, null], recorded);
         }
 
         private class Helper
         {
-            private MutableDependency<string> demo;
-
-            public Helper()
-            {
-                this.demo = D.Mutable<string>();
-            }
-
-            public MutableDependency<string> Demo => this.demo;
+            public MutableDependency<int> Demo { get; } = D.Mutable<int>();
         }
     }
 }
