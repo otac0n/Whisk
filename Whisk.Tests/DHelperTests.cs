@@ -1,4 +1,4 @@
-// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
+﻿// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
 
 namespace Whisk.Tests
 {
@@ -43,6 +43,14 @@ namespace Whisk.Tests
         {
             IDependency dependency = null;
             var exception = Assert.Throws<ArgumentNullException>(() => D.Pure(dependency, () => "OK"));
+            Assert.Equal(nameof(dependency), exception.ParamName);
+        }
+
+        [Fact]
+        public void Transient_WhenGivenANullDependency_ThrowsArgumentNullException()
+        {
+            IDependency dependency = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Transient(dependency, () => "OK"));
             Assert.Equal(nameof(dependency), exception.ParamName);
         }
 

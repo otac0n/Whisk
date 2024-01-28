@@ -105,18 +105,6 @@ namespace Whisk
         /// <summary>
         /// Creates a pure computation dependency.
         /// </summary>
-        /// <typeparam name="TDependency">The static type of dependency passed-in.</typeparam>
-        /// <typeparam name="TValue">The static type of value that will be returned.</typeparam>
-        /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
-        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
-        /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
-        public static PureDependency<TValue> Pure<TDependency, TValue>(this TDependency dependency, Func<TDependency, TValue> evaluate)
-            where TDependency : IDependency
-                => new PureDependency<TValue>(dependency, () => evaluate(dependency));
-
-        /// <summary>
-        /// Creates a pure computation dependency.
-        /// </summary>
         /// <typeparam name="TIn">The static type of dependency passed-in.</typeparam>
         /// <typeparam name="TOut">The static type of value that will be returned.</typeparam>
         /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
@@ -128,13 +116,32 @@ namespace Whisk
         /// <summary>
         /// Creates a pure computation dependency.
         /// </summary>
+        /// <typeparam name="T">The static type of value that will be returned.</typeparam>
+        /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
+        /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
+        /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
+        public static TransientDependency<T> Transient<T>(IDependency dependency, Func<T> evaluate) => new TransientDependency<T>(dependency, evaluate);
+
+        /// <summary>
+        /// Creates a pure computation dependency.
+        /// </summary>
         /// <typeparam name="TIn">The static type of dependency passed-in.</typeparam>
         /// <typeparam name="TOut">The static type of value that will be returned.</typeparam>
         /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
-        public static PureDependency<TOut> Cast<TIn, TOut>(IDependency<TIn> dependency)
-            => new PureDependency<TOut>(dependency, () => (TOut)(object)dependency.Value);
+        public static TransientDependency<TOut> Transient<TIn, TOut>(this IDependency<TIn> dependency, Func<TIn, TOut> evaluate)
+            => new TransientDependency<TOut>(dependency, () => evaluate(dependency.Value));
+
+        /// <summary>
+        /// Creates a dependency representing a cast.
+        /// </summary>
+        /// <typeparam name="TIn">The static type of dependency passed-in.</typeparam>
+        /// <typeparam name="TOut">The static type of value that will be returned.</typeparam>
+        /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
+        /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
+        public static IDependency<TOut> Cast<TIn, TOut>(this IDependency<TIn> dependency)
+            => new TransientDependency<TOut>(dependency, () => (TOut)(object)dependency.Value); // TODO: Transient for a class, pure for a struct? Since unboxing/boxing a strutct can be much more expensive, it may make sense to cahce.
 
         /// <summary>
         /// Atomically processes the <see cref="ValueUpdate">value updates</see> obtained by calling <see cref="Value{T}(MutableDependency{T}, T)"/>.
