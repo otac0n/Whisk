@@ -1,4 +1,4 @@
-// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
+﻿// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
 
 namespace Whisk
 {
@@ -10,7 +10,7 @@ namespace Whisk
     /// <typeparam name="T">The static type of the nested value contained.</typeparam>
     public sealed class NestedDependency<T> : IDependency<T>
     {
-        private IDependency<IDependency<T>> nested;
+        private readonly IDependency<IDependency<T>> nested;
         private IDependency<T> value;
         private bool subscribed;
 
@@ -33,14 +33,11 @@ namespace Whisk
         public event EventHandler<EventArgs> SweepInvalidated;
 
         /// <inheritdoc/>
-        public T Value => this.nested.Value is IDependency<T> dependency
+        public T Value => this.value is IDependency<T> dependency
             ? dependency.Value
             : default;
 
-        private void Nested_MarkInvalidated(object sender, EventArgs e) =>
-            this.MarkInvalidated?.Invoke(sender, e);
-
-        private void Nested_SweepInvalidated(object sender, EventArgs e)
+        private void Nested_MarkInvalidated(object sender, EventArgs e)
         {
             if (this.subscribed)
             {
@@ -49,7 +46,13 @@ namespace Whisk
                 this.subscribed = false;
             }
 
+            this.MarkInvalidated?.Invoke(sender, e);
+        }
+
+        private void Nested_SweepInvalidated(object sender, EventArgs e)
+        {
             this.value = this.nested.Value;
+
             if (this.value is IDependency<T> dependency)
             {
                 this.value.MarkInvalidated += this.Value_MarkInvalidated;

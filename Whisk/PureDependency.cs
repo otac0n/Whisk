@@ -1,4 +1,4 @@
-// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
+﻿// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
 
 namespace Whisk
 {
@@ -31,6 +31,7 @@ namespace Whisk
         /// <inheritdoc/>
         public event EventHandler<EventArgs> SweepInvalidated;
 
+        [Flags]
         private enum State : byte
         {
             Dirty = 0b00,
