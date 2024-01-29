@@ -38,7 +38,7 @@ namespace Whisk
         /// <typeparam name="T">The static type of the value stored.</typeparam>
         /// <param name="value">The value to store as a dependency.</param>
         /// <returns>A <see cref="ConstantDependency{T}"/> containing the specified value.</returns>
-        public static ConstantDependency<T> Constant<T>(T value) => new ConstantDependency<T>(value);
+        public static ConstantDependency<T> Constant<T>(T value) => new(value);
 
         /// <summary>
         /// Creates a mutable dependency.
@@ -47,7 +47,7 @@ namespace Whisk
         /// <param name="value">The initial value to store.</param>
         /// <param name="comparer">An optional equality comparer used to determine if a value has changed.</param>
         /// <returns>A <see cref="MutableDependency{T}"/> containing the specified value.</returns>
-        public static MutableDependency<T> Mutable<T>(T value = default, IEqualityComparer<T> comparer = null) => new MutableDependency<T>(value, comparer);
+        public static MutableDependency<T> Mutable<T>(T value = default, IEqualityComparer<T> comparer = null) => new(value, comparer);
 
         /// <summary>
         /// Creates a property change dependency using a notification event.
@@ -78,10 +78,7 @@ namespace Whisk
         public static IDependency<TValue> PropertyChanged<TSource, TValue>(this TSource source, Expression<Func<TSource, TValue>> get)
             where TSource : class, INotifyPropertyChanged
         {
-            if (get == null)
-            {
-                throw new ArgumentNullException(nameof(get));
-            }
+            ArgumentNullException.ThrowIfNull(get);
 
             if (get.Body is MemberExpression getMember && getMember.Expression == get.Parameters[0] && (getMember.Member is FieldInfo || getMember.Member is PropertyInfo))
             {
@@ -100,7 +97,7 @@ namespace Whisk
         /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
-        public static PureDependency<T> Pure<T>(IDependency dependency, Func<T> evaluate) => new PureDependency<T>(dependency, evaluate);
+        public static PureDependency<T> Pure<T>(IDependency dependency, Func<T> evaluate) => new(dependency, evaluate);
 
         /// <summary>
         /// Creates a pure computation dependency.
@@ -111,7 +108,7 @@ namespace Whisk
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
         public static PureDependency<TOut> Pure<TIn, TOut>(this IDependency<TIn> dependency, Func<TIn, TOut> evaluate)
-            => new PureDependency<TOut>(dependency, () => evaluate(dependency.Value));
+            => new(dependency, () => evaluate(dependency.Value));
 
         /// <summary>
         /// Creates a pure computation dependency.
@@ -120,7 +117,7 @@ namespace Whisk
         /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
-        public static TransientDependency<T> Transient<T>(IDependency dependency, Func<T> evaluate) => new TransientDependency<T>(dependency, evaluate);
+        public static TransientDependency<T> Transient<T>(IDependency dependency, Func<T> evaluate) => new(dependency, evaluate);
 
         /// <summary>
         /// Creates a pure computation dependency.
@@ -131,7 +128,7 @@ namespace Whisk
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
         public static TransientDependency<TOut> Transient<TIn, TOut>(this IDependency<TIn> dependency, Func<TIn, TOut> evaluate)
-            => new TransientDependency<TOut>(dependency, () => evaluate(dependency.Value));
+            => new(dependency, () => evaluate(dependency.Value));
 
         /// <summary>
         /// Creates a dependency representing a cast.
@@ -141,7 +138,7 @@ namespace Whisk
         /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
         public static IDependency<TOut> Cast<TIn, TOut>(this IDependency<TIn> dependency)
-            => new TransientDependency<TOut>(dependency, () => (TOut)(object)dependency.Value); // TODO: Transient for a class, pure for a struct? Since unboxing/boxing a strutct can be much more expensive, it may make sense to cahce.
+            => new TransientDependency<TOut>(dependency, () => (TOut)(object)dependency.Value); // TODO: Transient for a class, pure for a struct? Since unboxing/boxing a strutct can be much more expensive, it may make sense to cache.
 
         /// <summary>
         /// Atomically processes the <see cref="ValueUpdate">value updates</see> obtained by calling <see cref="Value{T}(MutableDependency{T}, T)"/>.
@@ -189,15 +186,9 @@ namespace Whisk
         /// <returns>An <see cref="IDisposable"/> object that can be disposed to unsubscribe from the invocations.</returns>
         public static IDisposable Watch<T>(this IDependency<T> dependency, Action<T> action)
         {
-            if (dependency == null)
-            {
-                throw new ArgumentNullException(nameof(dependency));
-            }
+            ArgumentNullException.ThrowIfNull(dependency);
 
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
+            ArgumentNullException.ThrowIfNull(action);
 
             void Handler(object sender, EventArgs args) => action(dependency.Value);
             action(dependency.Value);
@@ -210,7 +201,7 @@ namespace Whisk
         /// </summary>
         /// <typeparam name="TSource">The type of the source object.</typeparam>
         /// <typeparam name="TValue">The type of the property being presented.</typeparam>
-        public struct PropertyBuilder<TSource, TValue>
+        public readonly struct PropertyBuilder<TSource, TValue>
             where TSource : class
         {
             private readonly Func<TSource, TValue> get;

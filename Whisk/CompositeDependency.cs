@@ -1,3 +1,5 @@
+﻿// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
+
 namespace Whisk
 {
     using System;
@@ -6,8 +8,8 @@ namespace Whisk
     internal class CompositeDependency : IDependency
     {
         private readonly IDependency[] dependencies;
-        private bool subscribedMark = false;
-        private bool subscribedSweep = false;
+        private bool subscribedMark;
+        private bool subscribedSweep;
 
         public CompositeDependency(params IDependency[] dependencies)
         {

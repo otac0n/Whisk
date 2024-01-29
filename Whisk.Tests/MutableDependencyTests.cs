@@ -9,16 +9,16 @@ namespace Whisk.Tests
     public class MutableDependencyTests
     {
         public static readonly object[][] TestValues =
-        {
-            new object[] { 0 },
-            new object[] { 1 },
-            new object[] { 2 },
-            new object[] { -1 },
-            new object[] { 10 },
-            new object[] { 1024 },
-            new object[] { int.MaxValue },
-            new object[] { int.MinValue },
-        };
+        [
+            [0],
+            [1],
+            [2],
+            [-1],
+            [10],
+            [1024],
+            [int.MaxValue],
+            [int.MinValue],
+        ];
 
         [Theory]
         [MemberData(nameof(TestValues))]

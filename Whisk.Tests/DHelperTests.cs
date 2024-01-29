@@ -11,16 +11,16 @@ namespace Whisk.Tests
     public class DHelperTests
     {
         public static readonly object[][] TestValues =
-        {
-            new object[] { 0 },
-            new object[] { 1 },
-            new object[] { 2 },
-            new object[] { -1 },
-            new object[] { 10 },
-            new object[] { 1024 },
-            new object[] { int.MaxValue },
-            new object[] { int.MinValue },
-        };
+        [
+            [0],
+            [1],
+            [2],
+            [-1],
+            [10],
+            [1024],
+            [int.MaxValue],
+            [int.MinValue],
+        ];
 
         [Fact]
         public void All_WhenGivenANullDependenciesList_ThrowsArgumentNullException()
@@ -33,7 +33,7 @@ namespace Whisk.Tests
         [Fact]
         public void All_WhenGivenANullDependency_ThrowsArgumentOutOfRangeException()
         {
-            IDependency[] dependencies = { null };
+            IDependency[] dependencies = [null];
             var exception = Assert.Throws<ArgumentOutOfRangeException>(() => D.All(dependencies));
             Assert.Equal(nameof(dependencies), exception.ParamName);
         }
@@ -133,7 +133,7 @@ namespace Whisk.Tests
         [Fact]
         public void Set_WhenGivenANullValueUpdate_ThrowsArgumentOutOfRangeException()
         {
-            ValueUpdate[] setters = { null };
+            ValueUpdate[] setters = [null];
             var exception = Assert.Throws<ArgumentOutOfRangeException>(() => D.Set(setters));
             Assert.Equal(nameof(setters), exception.ParamName);
         }
@@ -151,7 +151,7 @@ namespace Whisk.Tests
                 D.Set(D.Value(first, "Elton"), D.Value(last, "John"));
             }
 
-            Assert.Equal(distinct, new HashSet<string> { "Reginald Dwight", "Elton John" });
+            Assert.Equal(distinct, ["Reginald Dwight", "Elton John"]);
         }
 
         [Fact]

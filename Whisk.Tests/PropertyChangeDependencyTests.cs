@@ -1,4 +1,4 @@
-// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
+﻿// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
 
 namespace Whisk.Tests
 {
@@ -12,7 +12,7 @@ namespace Whisk.Tests
         public void NameChangedClassic_WhenMarkInvalidatedWhileUnsubscribed_RemovesDownstreamSubscriptions()
         {
             var stub = new PropertyChangeStub("OK");
-            void MarkInvalidated(object sender, EventArgs e)
+            static void MarkInvalidated(object sender, EventArgs e)
             {
             }
 
@@ -38,7 +38,7 @@ namespace Whisk.Tests
         public void NameChangedClassic_WhenSweepInvalidatedWhileUnsubscribed_RemovesDownstreamSubscriptions()
         {
             var stub = new PropertyChangeStub("OK");
-            void SweepInvalidated(object sender, EventArgs e)
+            static void SweepInvalidated(object sender, EventArgs e)
             {
             }
 
@@ -67,7 +67,7 @@ namespace Whisk.Tests
         public void OnNameChanged_WhenMarkInvalidatedWhileUnsubscribed_RemovesDownstreamSubscriptions()
         {
             var stub = new PropertyChangeStub("OK");
-            void MarkInvalidated(object sender, EventArgs e)
+            static void MarkInvalidated(object sender, EventArgs e)
             {
             }
 
@@ -93,7 +93,7 @@ namespace Whisk.Tests
         public void OnNameChanged_WhenSweepInvalidatedWhileUnsubscribed_RemovesDownstreamSubscriptions()
         {
             var stub = new PropertyChangeStub("OK");
-            void SweepInvalidated(object sender, EventArgs e)
+            static void SweepInvalidated(object sender, EventArgs e)
             {
             }
 
@@ -122,7 +122,7 @@ namespace Whisk.Tests
         public void PropertyChanged_WhenMarkInvalidatedWhileUnsubscribed_RemovesDownstreamSubscriptions()
         {
             var stub = new PropertyChangeStub("OK");
-            void MarkInvalidated(object sender, EventArgs e)
+            static void MarkInvalidated(object sender, EventArgs e)
             {
             }
 
@@ -148,7 +148,7 @@ namespace Whisk.Tests
         public void PropertyChanged_WhenSweepInvalidatedWhileUnsubscribed_RemovesDownstreamSubscriptions()
         {
             var stub = new PropertyChangeStub("OK");
-            void SweepInvalidated(object sender, EventArgs e)
+            static void SweepInvalidated(object sender, EventArgs e)
             {
             }
 
@@ -180,7 +180,7 @@ namespace Whisk.Tests
             var dependecy = D.PropertyChanged(stub, a => a.Name);
 
             dependecy.SweepInvalidated += SweepInvalidated;
-            void SweepInvalidated(object sender, EventArgs e)
+            static void SweepInvalidated(object sender, EventArgs e)
             {
                 throw new Exception("Notification unexpected.");
             }

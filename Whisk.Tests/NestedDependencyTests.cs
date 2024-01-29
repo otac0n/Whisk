@@ -1,4 +1,6 @@
-﻿namespace Whisk.Tests
+﻿// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
+
+namespace Whisk.Tests
 {
     using System.Collections.Generic;
     using Xunit;
