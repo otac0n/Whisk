@@ -108,7 +108,10 @@ namespace Whisk
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
         public static PureDependency<TOut> Pure<TIn, TOut>(this IDependency<TIn> dependency, Func<TIn, TOut> evaluate)
-            => new(dependency, () => evaluate(dependency.Value));
+        {
+            ArgumentNullException.ThrowIfNull(evaluate);
+            return new(dependency, () => evaluate(dependency.Value));
+        }
 
         /// <summary>
         /// Creates a pure computation dependency.
@@ -128,7 +131,10 @@ namespace Whisk
         /// <param name="evaluate">A function that will be invoked to recompute the value of the dependency.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
         public static TransientDependency<TOut> Transient<TIn, TOut>(this IDependency<TIn> dependency, Func<TIn, TOut> evaluate)
-            => new(dependency, () => evaluate(dependency.Value));
+        {
+            ArgumentNullException.ThrowIfNull(evaluate);
+            return new(dependency, () => evaluate(dependency.Value));
+        }
 
         /// <summary>
         /// Creates a dependency representing a cast.

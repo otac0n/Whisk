@@ -47,11 +47,59 @@ namespace Whisk.Tests
         }
 
         [Fact]
+        public void Pure_WhenGivenANullDependency_Overload_ThrowsArgumentNullException()
+        {
+            IDependency<int> dependency = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Pure(dependency, _ => "OK"));
+            Assert.Equal(nameof(dependency), exception.ParamName);
+        }
+
+        [Fact]
+        public void Pure_WhenGivenANullEvaluate_ThrowsArgumentNullException()
+        {
+            Func<string> evaluate = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Pure(NullDependency.Instance, evaluate));
+            Assert.Equal(nameof(evaluate), exception.ParamName);
+        }
+
+        [Fact]
+        public void Pure_WhenGivenANullEvaluate_Overload_ThrowsArgumentNullException()
+        {
+            Func<int, string> evaluate = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Pure(D.Constant(0), evaluate));
+            Assert.Equal(nameof(evaluate), exception.ParamName);
+        }
+
+        [Fact]
         public void Transient_WhenGivenANullDependency_ThrowsArgumentNullException()
         {
             IDependency dependency = null;
             var exception = Assert.Throws<ArgumentNullException>(() => D.Transient(dependency, () => "OK"));
             Assert.Equal(nameof(dependency), exception.ParamName);
+        }
+
+        [Fact]
+        public void Transient_WhenGivenANullDependency_Overload_ThrowsArgumentNullException()
+        {
+            IDependency<int> dependency = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Transient(dependency, _ => "OK"));
+            Assert.Equal(nameof(dependency), exception.ParamName);
+        }
+
+        [Fact]
+        public void Transient_WhenGivenANullEvaluate_ThrowsArgumentNullException()
+        {
+            Func<string> evaluate = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Transient(NullDependency.Instance, evaluate));
+            Assert.Equal(nameof(evaluate), exception.ParamName);
+        }
+
+        [Fact]
+        public void Transient_WhenGivenANullEvaluate_Overload_ThrowsArgumentNullException()
+        {
+            Func<int, string> evaluate = null;
+            var exception = Assert.Throws<ArgumentNullException>(() => D.Transient(D.Constant(0), evaluate));
+            Assert.Equal(nameof(evaluate), exception.ParamName);
         }
 
         [Theory]
