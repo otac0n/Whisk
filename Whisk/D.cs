@@ -138,7 +138,7 @@ namespace Whisk
         /// <param name="dependency">The dependency or dependencies that will be involved in the compuatation of the value.</param>
         /// <returns>A dependency that will evaluate the specified function on-demand when its own dependency has changed.</returns>
         public static IDependency<TOut> Cast<TIn, TOut>(this IDependency<TIn> dependency)
-            => new TransientDependency<TOut>(dependency, () => (TOut)(object)dependency.Value); // TODO: Transient for a class, pure for a struct? Since unboxing/boxing a strutct can be much more expensive, it may make sense to cache.
+            => new TransientDependency<TOut>(dependency, () => (TOut)(object)dependency.Value);
 
         /// <summary>
         /// Atomically processes the <see cref="ValueUpdate">value updates</see> obtained by calling <see cref="Value{T}(MutableDependency{T}, T)"/>.
